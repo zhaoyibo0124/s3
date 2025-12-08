@@ -1,0 +1,157 @@
+.week-mode {
+  overflow: hidden;
+  filter: invert(80%);
+}
+
+// .beauty-scroll{
+//   scrollbar-color: @primary-color @primary-2;
+//   scrollbar-width: thin;
+//   -ms-overflow-style:none;
+//   position: relative;
+//   &::-webkit-scrollbar{
+//     width: 3px;
+//     height: 1px;
+//   }
+//   &::-webkit-scrollbar-thumb {
+//     border-radius: 3px;
+//     background: @primary-color;
+//   }
+//   &::-webkit-scrollbar-track {
+//     -webkit-box-shadow: inset 0 0 1px rgba(0,0,0,0);
+//     border-radius: 3px;
+//     background: @primary-3;
+//   }
+// }
+.split-right {
+  &:not(:last-child) {
+    border-right: 1px solid rgba(98, 98, 98, 0.2);
+  }
+}
+
+.disabled {
+  cursor: not-allowed;
+  color: @disabled-color;
+  pointer-events: none;
+}
+
+// 自定义主题
+
+.ant-layout-header {
+  height: 64px;
+}
+
+// .ant-layout-sider {
+//   background: #1F63D1;
+// }
+
+// .ant-menu.ant-menu-dark .ant-menu-item-selected,
+// .ant-menu-submenu-popup.ant-menu-dark .ant-menu-item-selected {
+//   background-color: #1F63D1;
+// }
+
+// .ant-menu-item>a {
+//   color: #fff !important;
+// }
+
+// .ant-menu-inline .ant-menu-item {
+//   border-radius: 21px;
+// }
+
+// .ant-menu-inline .ant-menu-item::after {
+//   border: none;
+// }
+
+// .ant-menu-item:active {
+//   background-color: #fff;
+// }
+
+// .ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
+//   background-color: #fff;
+//   color: #1F63D1;
+// }
+
+// .ant-menu-dark .ant-menu-inline.ant-menu-sub {
+//   background: #1F63D1;
+//   box-shadow: unset;
+// }
+
+// .ant-menu-submenu:active,
+// .ant-menu-submenu-inline:active {
+//   background-color: transparent !important;
+// }
+
+// .ant-menu-dark .ant-menu-item-selected>a {
+//   color: #1F63D1 !important;
+// }
+
+// .ant-menu-dark .ant-menu-item-selected>a,
+// .ant-menu-dark .ant-menu-item-selected>a:hover {
+//   color: #1F63D1;
+// }
+
+// .ant-menu {
+//   color: #fff;
+// }
+
+.btn-block {
+  display: flex;
+  justify-content: center;
+  margin: 26px auto;
+
+  span {
+    display: inline-block;
+    height: 48px;
+    line-height: 48px;
+    border-radius: 8px;
+    text-align: center;
+    font-family: 'SourceHanSansCN-Normal';
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .btn-my-primary {
+    width: 140px;
+    margin-right: 18px;
+    background: #1F63D1;
+    color: #FFF;
+  }
+
+  .btn-default {
+    width: 140px;
+    border: 1px solid #1F63D1;
+    color: #1F63D1;
+  }
+
+  .btn {
+    display: inline-block;
+    height: 48px;
+    line-height: 48px;
+    padding: 0 10px;
+    border-radius: 8px;
+    text-align: center;
+    font-family: 'SourceHanSansCN-Normal';
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    background: #fff;
+    border: 1px solid #1F63D1;
+    color: #1F63D1;
+
+    img {
+      width: 28px;
+      height: 28px;
+      margin-top: -3px;
+    }
+
+    &:active {
+      background: rgba(31, 99, 209, 0.3);
+      border: 1px solid rgba(31, 99, 209, 0.2);
+      color: #fff;
+    }
+  }
+}
+
+.ant-modal-root div[aria-hidden="true"] {
+  display: none !important;
+}

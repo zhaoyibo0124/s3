@@ -1,0 +1,14 @@
+# Tendering Web
+
+## 使用
+
+### yarn
+```bash
+$ yarn install
+$ yarn serve
+```
+### or npm
+```
+$ npm install
+$ npm run serve
+```

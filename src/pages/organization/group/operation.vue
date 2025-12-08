@@ -1,0 +1,318 @@
+<template>
+	<a-modal
+		:class="[simpleClass]"
+		:bodyStyle="{padding:0}"
+		:title="title"
+		:visible="visible"
+		@cancel="handleCancel"
+		:cancel-button-props="{props: {display: true}}"
+		:maskClosable="false"
+		centered
+		width="640px"
+	>
+		<template slot="footer">
+			<template v-if="title == '新增' || title == '编辑'">
+				<a-button @click="handleCancel">取消</a-button>
+				<a-button type="primary"  @click="handleOk" :loading="handleOkLoading">确定</a-button>
+			</template>
+			<template v-if="title == '查看'">
+				<a-button @click="handleCancel">关 闭</a-button>
+			</template>
+		</template>
+		<a-form-model
+			ref="ruleForm"
+			:model="form"
+			:rules="rules"
+			:label-col="labelCol"
+			:wrapper-col="wrapperCol"
+			style="padding-top: 10px;"
+		>
+			<a-form-model-item label="用户组编码" prop="groupCode">
+				<a-input v-model="form.groupCode" placeholder="请输入" :disabled="title == '查看'" />
+			</a-form-model-item>
+			<a-form-model-item label="用户组名称" prop="groupName">
+				<a-input v-model="form.groupName" placeholder="请输入" :disabled="title == '查看'" />
+			</a-form-model-item>
+			<a-form-model-item label="用户组排序" prop="groupSort">
+				<a-input-number style="width: 100%" :min="0" :max="9999" v-model="form.groupSort" placeholder="请输入" :disabled="title == '查看'" />
+			</a-form-model-item>
+			<a-form-model-item label="用户组备住" prop="groupContent">
+				<a-textarea rows="4" v-model="form.groupContent" placeholder="请输入" :disabled="title == '查看'"/>
+			</a-form-model-item>
+			<a-form-model-item label="用户组关联系统" prop="groupSystemIds">
+				<a-checkbox-group v-model="form.groupSystemIds" @change="queryRoleList(form.groupSystemIds)" :options="systemList" :disabled="title == '查看'" />
+			</a-form-model-item>
+			<a-form-model-item label="用户组关联角色" prop="groupRoleIds">
+				<a-checkbox-group v-model="form.groupRoleIds" :options="roleList" :disabled="title == '查看'" />
+			</a-form-model-item>
+		</a-form-model>
+	</a-modal>
+</template>
+<script>
+	import {
+		GroupAdd,
+		GroupUpdate,
+		SystemQueryList,
+		RoleQueryRoleList
+	} from '@/services/commentApiList'
+	var mouseDownX = 0
+	var mouseDownY = 0
+	var deltaX = 0
+	var deltaY = 0
+	var sumX = 0
+	var sumY = 0
+	var header = null
+	var contain = null
+	var modalContent = null
+	var onmousedown = false
+  export default {
+    name: 'addAlert',
+    props: ['title','defaultData'],
+    data() {
+      return {
+				queryJsonBasicList: JSON.parse(sessionStorage.getItem('queryJsonBasicList')),		// 存储数据角色
+				visible: true,
+				handleOkLoading: false,
+				labelCol: {span: 5, offset: 3},
+				wrapperCol: {span: 11, offset: 1},
+				form: {
+					id: this.defaultData.data.id?this.defaultData.data.id:'',
+					groupCode: this.defaultData.data.groupCode?this.defaultData.data.groupCode:'',
+					groupName: this.defaultData.data.groupName?this.defaultData.data.groupName:'',
+					groupContent: this.defaultData.data.groupContent?this.defaultData.data.groupContent:'',
+					groupSort: this.defaultData.data.groupSort?this.defaultData.data.groupSort:'',
+					groupSystemIds: this.defaultData.data.groupSystemIds?this.defaultData.data.groupSystemIds:[],
+					groupRoleIds: this.defaultData.data.groupRoleIds?this.defaultData.data.groupRoleIds:[],
+				},
+				rules: {
+					groupCode: [
+						{required: true, message: '请输入用户组编码', trigger: 'blur'},
+					],
+					groupName: [
+						{required: true, message: '请输入用户组名称', trigger: 'blur'},
+					],
+					groupSort: [
+						{required: true, message: '请输入用户组排序', trigger: 'blur'},
+					],
+					groupContent: [
+						{required: true, message: '请输入用户组备住', trigger: 'blur'},
+					],
+				},
+				systemList: [],
+				roleList: []
+			}
+    },
+    computed: {
+			simpleClass() {
+				return Math.random().toString(36).substring(2)
+			}
+		},
+		watch: {
+			visible() {
+				this.$nextTick(() => {
+					this.initialEvent(this.visible)
+				})
+			}
+		},
+		mounted() {
+			this.$nextTick(() => {
+				this.initialEvent(this.visible)
+			})
+		},
+		created() {
+			if(this.title != '新增'){
+				this.queryRoleList(this.form.groupSystemIds)
+			}
+			this.querySystemList()
+		},
+		beforeDestroy() {
+			this.removeMove()
+			window.removeEventListener('mouseup', this.removeUp, false)
+		},
+    methods: {
+			querySystemList() {
+				const data = {
+					pageNo: -1,
+					pageSize: 10
+				}
+				SystemQueryList(data).then(res => {
+					const data = res.data
+					if (data.code == 200) {
+						this.systemList = []
+						let systemList = []
+						data.data.list.forEach(item => {
+							let template = {}
+							template.value = item.id
+							template.label = item.systemName
+							systemList.push(template)
+						})
+						this.systemList = systemList
+					} else {
+						this.$message.error(data.msg)
+					}
+				})
+			},
+			queryRoleList(groupSystemIds) {
+				if(groupSystemIds.length == 0){
+					this.roleList = []
+				}else{
+					this.roleList = []
+					groupSystemIds.forEach(item => {
+						const data = {
+							pageNo: -1,
+							pageSize: 10,
+							systemId: item
+						}
+						RoleQueryRoleList(data).then(res => {
+							const data = res.data
+							if (data.code == 200) {
+								data.data.list.forEach(item => {
+									let template = {}
+									template.value = item.id
+									template.label = item.roleName
+									this.roleList.push(template)
+								})
+							} else {
+								this.$message.error(data.msg)
+							}
+						})
+					})
+				}
+			},
+			handleOk() {
+				this.$refs.ruleForm.validate(valid => {
+					this.handleOkLoading = true
+					if(valid){
+						if(this.title == '新增'){
+							const data = {
+								groupCode: this.form.groupCode,
+								groupName: this.form.groupName,
+								groupContent: this.form.groupContent,
+								groupSort: this.form.groupSort,
+								groupSystemIds: this.form.groupSystemIds,
+								groupRoleIds: this.form.groupRoleIds,
+							}
+							GroupAdd(data).then(res => {
+								this.handleOkLoading = false
+								const data = res.data
+								if(data.code == 200){
+									this.$refs.ruleForm.resetFields()		// 清空表单
+									this.resetModal()		// 重置Modal位置
+									this.$emit('confirmValue', '')
+								}else{
+									this.$message.error(data.msg)
+								}
+							})
+						}else if(this.title == '编辑'){
+							const data = {
+								id: this.form.id,
+								groupCode: this.form.groupCode,
+								groupName: this.form.groupName,
+								groupContent: this.form.groupContent,
+								groupSort: this.form.groupSort,
+								groupSystemIds: this.form.groupSystemIds,
+								groupRoleIds: this.form.groupRoleIds,
+							}
+							GroupUpdate(data).then(res => {
+								this.handleOkLoading = false
+								const data = res.data
+								if(data.code == 200){
+									this.$refs.ruleForm.resetFields()		// 清空表单
+									this.resetModal()		// 重置Modal位置
+									this.$emit('confirmValue', '')
+								}else{
+									this.$message.error(data.msg)
+								}
+							})
+						}else{
+							this.handleOkLoading = false
+							this.$message.info('title无效，请刷新重试！')
+						}
+					}else{
+						this.handleOkLoading = false
+						return false
+					}
+					this.resetModal()		// 重置Modal位置
+				})
+			},
+			handleCancel() {
+				this.resetModal()		// 重置Modal位置
+				this.$refs.ruleForm.resetFields()		// 清空表单
+				this.$emit('cancelValue')
+			},
+			// 可拖动相关
+			resetNum() {
+				mouseDownX = 0
+				mouseDownY = 0
+				deltaX = 0
+				deltaY = 0
+				sumX = 0
+				sumY = 0
+			},
+			handleMove(event) {
+				const delta1X = event.pageX - mouseDownX
+				const delta1Y = event.pageY - mouseDownY
+				deltaX = delta1X
+				deltaY = delta1Y
+				modalContent.style.transform = `translate(${delta1X + sumX}px, ${delta1Y + sumY}px)`
+			},
+			initialEvent(visible) {
+				if(visible){
+					setTimeout(() => {
+						window.removeEventListener('mouseup', this.removeUp, false)
+						contain = document.getElementsByClassName(this.simpleClass)[0]
+						header = contain.getElementsByClassName('ant-modal-header')[0]
+						modalContent = contain.getElementsByClassName('ant-modal-content')[0]
+						modalContent.style.left = 0
+						modalContent.style.transform = 'translate(0px,0px)'
+						header.style.cursor = 'all-scroll'
+						header.onmousedown = (e) => {
+							onmousedown = true
+							mouseDownX = e.pageX
+							mouseDownY = e.pageY
+							document.body.onselectstart = () => false
+							window.addEventListener('mousemove', this.handleMove, false)
+						}
+						window.addEventListener('mouseup', this.removeUp, false)
+					}, 0)
+				}
+			},
+			removeMove() {
+				window.removeEventListener('mousemove', this.handleMove, false)
+			},
+			removeUp(e) {
+				document.body.onselectstart = () => true
+				if (onmousedown && !(e.pageX === mouseDownX && e.pageY === mouseDownY)) {
+					onmousedown = false
+					sumX = sumX + deltaX
+					sumY = sumY + deltaY
+				}
+				this.removeMove()
+			},
+			// 重置弹框位置
+			resetModal() {
+				mouseDownX = 0
+				mouseDownY = 0
+				deltaX = 0
+				deltaY = 0
+				sumX = 0
+				sumY = 0
+				header = null
+				contain = null
+				modalContent = null
+				onmousedown = false
+			},
+    }
+  }
+</script>
+<style lang="less" scoped>
+	.ant-form-item{
+		margin-bottom: 10px;
+	}
+	.ant-modal-footer{
+		text-align: center;
+	}
+	.colorRed{
+		color: red;
+	}
+</style>
