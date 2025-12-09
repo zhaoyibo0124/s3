@@ -1,8 +1,11 @@
 <template>
-    <div class="bidSubproject" :style="`min-height: ${pageMinHeight}px`">
+    <div class="bidSubproject">
+        <div class="back-box" v-html="backText" @click="back"></div>
         <div class="gutter-box">
-            <div class="left-box"></div>
-            <div class="right-box">
+            <div class="left-box">
+                <Wps ref="wps" v-if="show" :detailData="detailData" />
+            </div>
+            <!-- <div class="right-box">
                 <div class="bt-box">
                     <img src="../../assets/img/icon1.png" alt="">
                     <span class="name">Hi~我是智能助手</span>
@@ -24,20 +27,32 @@
                 <div class="ai-box">
 
                 </div>
-            </div>
+            </div> -->
         </div>
         <div class="btn-box">
+            <a-button style="margin-right:15px" @click="AppletFullEdit()">全屏编辑</a-button>
+            <a-button style="margin-right:15px" @click="SaveFile">保存文档</a-button>
             <a-button type="primary" @click="submit">生成正文</a-button>
         </div>
     </div>
 </template>
 
 <script>
+
+import {
+    infoEntryDetailApi,
+    updatePreparationStatusApi
+} from '@/services/commentApiList'
 import { mapState, mapMutations } from 'vuex'
+import Wps from '../../components/wps'
 export default {
+    components: {
+        Wps
+    },
     data() {
         // let self = this
         return {
+            backText: '<返回',
             queryJsonBasicList: JSON.parse(sessionStorage.getItem('queryJsonBasicList')),		// 存储数据字典
             num: 7,
             total: 20,
@@ -102,14 +117,37 @@ export default {
                     label: '商务条款内容商务条款内容商务条款，内容商务条款内容商务条款内容商务条款内容商务条款内容。商务条款内容，商务条款内容商务条款内容商务条款内容。',
                     value: 7
                 },
-            ]
+            ],
+            detailData: {},
+            show:false
         }
     },
     computed: {
         ...mapState('setting', ['pageMinHeight']),
     },
+    created() {
+        this.getDetail()
+    },
     methods: {
         ...mapMutations('setting', ['showloadding']),
+        back() {
+            this.$router.go(-1)
+        },
+        getDetail() {
+            infoEntryDetailApi({
+                id: this.$route.query.id
+            }).then(res => {
+                // 全局loading隐藏
+                this.showloadding(false)
+                const data = res.data
+                if (data.code == 200) {
+                    this.detailData = data.data
+                    this.show = true
+                } else {
+                    this.$message.error(data.msg)
+                }
+            })
+        },
         nextContent() {
             // 切换到下一个内容，如果已经是最后一个，则循环到第一个
             this.currentIndex = (this.currentIndex + 1) % this.types.length;
@@ -130,18 +168,33 @@ export default {
         handleIgnore() {
 
         },
-        // 完成校验
+        // 生成正文
         submit() {
-            this.$router.push('/document')
+            this.showloadding(true)
+            this.$refs.wps.SaveFile()
+            updatePreparationStatusApi({
+                id: this.$route.query.id
+            }).then(res => {
+                // 全局loading隐藏
+                this.showloadding(false)
+                const data = res.data
+                if (data.code == 200) {
+                    this.$message.success('操作成功')
+                    this.$router.go(-1)
+                } else {
+                    this.$message.error(data.msg)
+                }
+            })
+        },
+        // 
+        AppletFullEdit(){
+            this.$refs.wps.AppletFullEdit()
+        },
+        SaveFile(){
+            this.$refs.wps.SaveFile()
         }
+        
     },
-    created() {
-        // 全局loading显示
-        this.showloadding(true)
-    },
-    mounted() {
-        this.showloadding(false)
-    }
 }
 </script>
 
@@ -150,16 +203,22 @@ export default {
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: 18px 18px 0 18px;
+    padding: 18px 0px 0 18px;
     background-color: #fff;
-
+    .back-box {
+        display: flex;
+        margin-top: 0px;
+        margin-bottom: 10px;
+        cursor: pointer;
+    }
     .gutter-box {
         display: flex;
-
+        margin-right: 0px;
         .left-box {
             display: flex;
-            width: calc(100% - 489px);
-            height: 640px;
+            // width: calc(100% - 489px);
+            width: 100%;
+            height: 940px;
             background: #F5F9FF;
             border-radius: 6px;
         }
@@ -168,7 +227,7 @@ export default {
             display: flex;
             flex-direction: column;
             width: 489px;
-            height: 640px;
+            height: 940px;
             background: #FFFFFF;
             margin-left: 19px;
 
@@ -243,10 +302,13 @@ export default {
     }
 
     .btn-box {
+        position: fixed;
+        left: 98px;
+        bottom: 0px;
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 100%;
+        width: calc(100% - 82px);
         height: 56px;
         background: #FFFFFF;
         box-shadow: 0px -3px 4px 0px rgba(0, 0, 0, 0.11);

@@ -22,28 +22,54 @@
 				</div>
 			</div>
 			<a-card v-if="operation.table">
+				<a-space style="margin-bottom: 18px;">
+					<a-button type="primary" @click="addBtn" v-if="operation.add">+ 新增</a-button>
+				</a-space>
 				<a-table :columns="columns" :dataSource="dataSource" :loading="tableLoading"
-					:rowKey="(record) => { return record.id }" :pagination="tablePagination">
+					:rowKey="(record) => { return record.id }" :pagination="tablePagination" :scroll="{ x: 1600 }">
 					<div slot="action" slot-scope="text, record">
 						<a-space>
-							<a-button type="link" @click="toDownBtn(record)">
-								下载
+							<a-button type="link" @click="editorBtn(record)" v-if="operation.update">
+								编 辑
+							</a-button>
+							<a-button type="link" @click="disableBtn(record)"
+								v-if="operation.disable && record.isDelete == '2'">
+								禁 用
+							</a-button>
+							<a-button type="link" @click="restoreBtn(record)"
+								v-if="operation.recovery && record.isDelete == '1'">
+								恢 复
+							</a-button>
+							<a-button type="link" @click="deleteBtn(record)" v-if="operation.delete">
+								删 除
+							</a-button>
+							<a-button type="link" @click="toViewBtn(record)">
+								查 看
 							</a-button>
 						</a-space>
 					</div>
 				</a-table>
 			</a-card>
+			<info-alert v-if="alertFlag" :title="alertTitle" :defaultData="defaultData" @confirmValue="confirmValue"
+				@cancelValue="cancelValue"></info-alert>
 		</div>
 	</div>
 </template>
 <script>
 import { mapState, mapMutations } from 'vuex'
+import infoAlert from './operation.vue'
 import {
-	exaUseQueryListApi,
+	basicLogicDeleteApi,
+	basicLogicDisableApi,
+	basicLogicRecoveryApi,
+	basicLogicQueryListApi,
 	PowerFindPowerOperation
 } from '@/services/commentApiList'
 export default {
-	name: 'usePage',
+	name: 'basePage',
+	components: {
+		infoAlert
+	},
 	data() {
 		let self = this
 		return {
@@ -58,43 +84,36 @@ export default {
 					width: 100
 				},
 				{
-					title: '项目规模',
-					dataIndex: 'projectScale',
-					customRender: (text, record) => <span>{this.queryJsonBasicList.projectScale.filter(item => item.code == record.projectScale).map(item =>
-						item.name)}</span>,
-					width: 100
-				},
-				{
-					title: '项目类别',
-					dataIndex: 'projectCategory',
-					customRender: (text, record) => <span>{this.queryJsonBasicList.projectCategory.filter(item => item.code == record.projectCategory).map(item =>
-						item.name)}</span>,
-					width: 120
-				},
-				{
-					title: '项目类型',
-					dataIndex: 'projectType',
-					customRender: (text, record) => <span>{this.queryJsonBasicList.projectType.filter(item => item.code == record.projectType).map(item =>
-						item.name)}</span>,
-					width: 140
-				},
-				{
-					title: '终止规则',
-					dataIndex: 'terminationRule',
+					title: '规则名称',
+					dataIndex: 'ruleName',
 					ellipsis: true,
-					width: 180,
-					customRender: (text, record) => <a-tooltip placement="topLeft" title={record.terminationRule}>{record.terminationRule}</a-tooltip>
+					width: 200,
+					customRender: (text, record) => <a-tooltip placement="topLeft" title={record.ruleName}>{record.ruleName}</a-tooltip>
 				},
 				{
-					title: '范本名称',
-					dataIndex: 'templateName',
+					title: '规则类型',
+					dataIndex: 'ruleType',
+					customRender: (text, record) => <span>{this.queryJsonBasicList.extractType.filter(item => item.code == record.ruleType).map(item =>
+						item.name)}</span>,
+				},
+				{
+					title: '模型名称',
+					dataIndex: 'modelName',
+					width: 180
+				},
+				{
+					title: '模型地址',
+					dataIndex: 'modelUrl',
 					ellipsis: true,
-					width: 180,
-					customRender: (text, record) => <a-tooltip placement="topLeft" title={record.templateName}>{record.templateName}</a-tooltip>
+					width: 200,
+					customRender: (text, record) => <a-tooltip placement="topLeft" title={record.modelUrl}>{record.modelUrl}</a-tooltip>
 				},
 				{
-					title: '创建人',
-					dataIndex: 'createUserName',
+					title: '模型提示词',
+					dataIndex: 'modelPrompt',
+					ellipsis: true,
+					width: 200,
+					customRender: (text, record) => <a-tooltip placement="topLeft" title={record.modelPrompt}>{record.modelPrompt}</a-tooltip>
 				},
 				{
 					title: '操作',
@@ -117,6 +136,7 @@ export default {
 			},
 			advanced: true,
 			searchForm: {
+				identifyRule: '',
 				isDelete: undefined
 			},
 			operation: {
@@ -174,10 +194,12 @@ export default {
 			// 全局loading显示
 			this.showloadding(true)
 			const data = {
+				identifyRule: this.searchForm.identifyRule,
+				isDelete: this.searchForm.isDelete,
 				pageNo: page == undefined ? this.tablePagination.defaultCurrent : page,
 				pageSize: pageSize == undefined ? this.tablePagination.defaultPageSize : pageSize
 			}
-			exaUseQueryListApi(data).then(res => {
+			basicLogicQueryListApi(data).then(res => {
 				// 全局loading隐藏
 				this.showloadding(false)
 				const data = res.data
@@ -190,6 +212,10 @@ export default {
 				}
 			})
 		},
+		// 展开/关闭
+		toggleAdvanced() {
+			this.advanced = !this.advanced
+		},
 		// 查询
 		handleSearch() {
 			if (this.operation.queryList) {
@@ -199,18 +225,124 @@ export default {
 		// 重置
 		handleReset() {
 			// 清空表单
+			this.searchForm.identifyRule = ''
 			this.searchForm.isDelete = undefined
 			if (this.operation.queryList) {
 				this.queryListData(this.tablePagination.defaultCurrent, this.tablePagination.defaultPageSize)
 			}
 		},
-		// 下载
-		toDownBtn(record) {
-			const BASE_URL = process.env.VUE_APP_API_BASE_URL;
-			// 模拟下载操作
-			let a = document.createElement('a')
-			a.href = `${BASE_URL}/examine/examine/exaTemplatePreparation/downTemplateFile?id=${record.id}`
-			a.click()
+		// 新增
+		addBtn() {
+			this.alertTitle = '新增'
+			this.alertFlag = true
+			this.defaultData.data = {}
+		},
+		// 子组件alert确认btn
+		confirmValue() {
+			this.alertFlag = false
+			if (this.operation.queryList) {
+				this.queryListData(this.tablePagination.defaultCurrent, this.tablePagination.defaultPageSize)
+			}
+		},
+		// 子组件alert取消btn
+		cancelValue() {
+			this.alertFlag = false
+		},
+		// 编辑
+		editorBtn(record) {
+			this.alertTitle = '编辑'
+			this.alertFlag = true
+			this.defaultData.data = record
+		},
+		// 查看
+		toViewBtn(record) {
+			this.alertTitle = '查看'
+			this.alertFlag = true
+			this.defaultData.data = record
+		},
+		// 删除
+		deleteBtn(record) {
+			let that = this
+			this.$confirm({
+				title: '是否删除此项？',
+				okText: '删除',
+				okType: 'danger',
+				cancelText: '取消',
+				onOk() {
+					const data = {
+						id: record.id
+					}
+					basicLogicDeleteApi(data).then(res => {
+						const data = res.data
+						if (data.code == 200) {
+							if (that.operation.queryList) {
+								that.queryListData(that.tablePagination.defaultCurrent, that.tablePagination.defaultPageSize)
+							}
+						} else {
+							that.$message.error(data.msg)
+						}
+					})
+				},
+				onCancel() {
+					console.log('Cancel')
+				},
+			})
+		},
+		// 禁用
+		disableBtn(record) {
+			let that = this
+			this.$confirm({
+				title: '是否禁用此项？',
+				okText: '禁用',
+				okType: 'danger',
+				cancelText: '取消',
+				onOk() {
+					const data = {
+						id: record.id
+					}
+					basicLogicDisableApi(data).then(res => {
+						const data = res.data
+						if (data.code == 200) {
+							if (that.operation.queryList) {
+								that.queryListData(that.tablePagination.defaultCurrent, that.tablePagination.defaultPageSize)
+							}
+						} else {
+							that.$message.error(data.msg)
+						}
+					})
+				},
+				onCancel() {
+					console.log('Cancel')
+				},
+			})
+		},
+		// 恢复
+		restoreBtn(record) {
+			let that = this
+			this.$confirm({
+				title: '是否恢复此项？',
+				okText: '恢复',
+				okType: 'danger',
+				cancelText: '取消',
+				onOk() {
+					const data = {
+						id: record.id
+					}
+					basicLogicRecoveryApi(data).then(res => {
+						const data = res.data
+						if (data.code == 200) {
+							if (that.operation.queryList) {
+								that.queryListData(that.tablePagination.defaultCurrent, that.tablePagination.defaultPageSize)
+							}
+						} else {
+							that.$message.error(data.msg)
+						}
+					})
+				},
+				onCancel() {
+					console.log('Cancel')
+				},
+			})
 		}
 	},
 }

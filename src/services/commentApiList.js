@@ -435,8 +435,61 @@ import {
   reviewDetail,
   documentUpload,
   contentEntry,
-  infoEntry
+  infoEntry,
+  infoEntryDetail,
+  updatePreparationStatus,
+  synchronize,
+  reviewAction,
+  recognizeQueryList,
+  recognizeDelete,
+  recognizeDisable,
+  recognizeRecovery,
+  recognizeUpdate,
+  recognizeAdd,
+  queryTypeList,
+  examineAction
 } from "@/services/api";
+export async function examineActionApi(data) {
+  return request(examineAction, METHOD.POST, data);
+}
+export async function queryTypeListApi(data) {
+  return request(queryTypeList, METHOD.POST, data);
+}
+
+
+export async function recognizeQueryListApi(data) {
+  return request(recognizeQueryList, METHOD.POST, data);
+}
+export async function recognizeDeleteApi(data) {
+  return request(recognizeDelete, METHOD.POST, data);
+}
+export async function recognizeDisableApi(data) {
+  return request(recognizeDisable, METHOD.POST, data);
+}
+export async function recognizeRecoveryApi(data) {
+  return request(recognizeRecovery, METHOD.POST, data);
+}
+export async function recognizeUpdateApi(data) {
+  return request(recognizeUpdate, METHOD.POST, data);
+}
+export async function recognizeAddApi(data) {
+  return request(recognizeAdd, METHOD.POST, data);
+}
+
+
+export async function reviewActionApi(data) {
+  return request(reviewAction, METHOD.POST, data);
+}
+export async function synchronizeApi(data) {
+  return request(synchronize, METHOD.POST, data);
+}
+
+export async function updatePreparationStatusApi(data) {
+  return request(updatePreparationStatus, METHOD.POST, data);
+}
+export async function infoEntryDetailApi(data) {
+  return request(infoEntryDetail, METHOD.POST, data);
+}
 export async function infoEntryApi(data) {
   return request(infoEntry, METHOD.POST, data);
 }

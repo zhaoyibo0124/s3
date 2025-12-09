@@ -571,11 +571,31 @@ module.exports = {
 	// 文件审核列表
 	reviewQueryList:`${BASE_URL}/examine/examine/exaProject/queryList`,
 	reviewDetail:`${BASE_URL}/examine/examine/exaProject/findById`,
+	// 文件审核-审核操作
+	reviewAction:`${BASE_URL}/examine/examine/review/review`,
 	//引用范本编制信息-上传文档
 	documentUpload:`${BASE_URL}/examine/examine/exaTemplatePreparation/addTemplatePreparationUpload`,
 	//引用范本编制信息-内容录入
 	contentEntry:`${BASE_URL}/examine/examine/exaTemplatePreparation/addTemplatePreparationContent`,
 	// 引用范本编制信息-关键信息
 	infoEntry:`${BASE_URL}/examine/examine/exaTemplatePreparation/addTemplatePreparationInformation`,
+	// 引用范本编制信息-获取详情 
+	infoEntryDetail:`${BASE_URL}/examine/examine/exaTemplatePreparation/findById`,
+	// 引用范本编制信息-完成 
+	updatePreparationStatus:`${BASE_URL}/examine/examine/exaTemplatePreparation/updatePreparationStatus`,
+	// 引用范本编制信息-同步
+	synchronize:`${BASE_URL}/examine/examine/exaTemplatePreparation/synchronize`,
+	// 智能编审智能体
+	recognizeQueryList:`${BASE_URL}/examine/examine/wriRecognizeRule/queryList`,
+	recognizeDelete:`${BASE_URL}/examine/examine/wriRecognizeRule/delete`,
+	recognizeDisable:`${BASE_URL}/examine/examine/wriRecognizeRule/disable`,
+	recognizeRecovery:`${BASE_URL}/examine/examine/wriRecognizeRule/recovery`,
+	recognizeUpdate:`${BASE_URL}/examine/examine/wriRecognizeRule/update`,
+	recognizeUpload:`${BASE_URL}/examine/examine/wriRecognizeRule/add`,
+	// 分类查询审核记录
+	queryTypeList:`${BASE_URL}/examine/examine/exaProjectExamine/queryTypeList`,
+	// 审核通过或拒绝
+	examineAction:`${BASE_URL}/examine/examine/exaProject/examine`,
+
 
 }

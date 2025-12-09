@@ -1,5 +1,5 @@
 <template>
-    <div class="bidSubproject" :style="`min-height: ${pageMinHeight}px`">
+    <div class="bidSubproject">
         <div class="gutter-box">
             <div class="serchInfo" v-if="operation.find">
                 <div class="search-box">
@@ -12,12 +12,13 @@
                             <a-input placeholder="请输入" v-model="searchForm.projectCode" allowClear
                                 style="width: 180px;" />
                         </a-form-model-item>
-                        <!-- <a-form-model-item label="审核状态">
+                        <a-form-model-item label="审核状态">
                             <a-select v-model="searchForm.status" placeholder="请选择" style="width: 150px;">
-                                <a-select-option v-for="item, index in queryJsonBasicList.projectCategory" :key="index"
+                                <a-select-option v-for="item, index in queryJsonBasicList.examineType" :key="index"
                                     :value="item.code">{{ item.name }}</a-select-option>
                             </a-select>
                         </a-form-model-item>
+                        <!-- 
                         <a-form-model-item label="文档类别">
                             <a-select v-model="searchForm.projectType" placeholder="请选择" style="width: 150px;">
                                 <a-select-option v-for="item, index in queryJsonBasicList.projectType" :key="index"
@@ -41,9 +42,6 @@
                 <a-table :loading="tableLoading" :columns="columns" :dataSource="dataSource"
                     :rowKey="(record, index) => { return index }" :pagination="tablePagination"
                     style="margin-top: 20px;" :scroll="{ x: 1200 }">
-                    <div slot="status" slot-scope="text, record">
-                        {{ statusText[record.status] }}
-                    </div>
                     <div slot="action" slot-scope="text, record" class="action-btn">
                         <a-button type="link" @click="examineBtn(record)">
                             审核
@@ -54,7 +52,6 @@
                     </div>
                 </a-table>
             </div>
-            <!-- :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }" -->
         </div>
     </div>
 </template>
@@ -62,6 +59,7 @@
 import { mapState, mapMutations } from 'vuex'
 import {
     reviewQueryListApi,
+    reviewActionApi
 } from '@/services/commentApiList'
 
 export default {
@@ -74,30 +72,7 @@ export default {
             tableLoading: false,
             // 获取表头
             dataSource: [
-                // {
-                //     id: 1,
-                //     archivesCode: 'BD12345678',
-                //     archivesName: '标段名标段名标段名标段名标段名标段名标段名标段名',
-                //     projectName: '档案名档案名档案名档案名档案名档案名档案名档案名',
-                //     createTime: '2025-09-01 15:36',
-                //     status: '1'
-                // },
-                // {
-                //     id: 2,
-                //     archivesCode: 'BD12345678',
-                //     archivesName: '标段名标段名标段名标段名标段名标段名标段名标段名',
-                //     projectName: '档案名档案名档案名档案名档案名档案名档案名档案名',
-                //     createTime: '2025-09-01 15:36',
-                //     status: '2'
-                // },
-                // {
-                //     id: 3,
-                //     archivesCode: 'BD12345678',
-                //     archivesName: '标段名标段名标段名标段名标段名标段名标段名标段名',
-                //     projectName: '档案名档案名档案名档案名档案名档案名档案名档案名',
-                //     createTime: '2025-09-01 15:36',
-                //     status: '3'
-                // }
+
             ],
             searchForm: {
                 projectName: '',
@@ -133,7 +108,6 @@ export default {
             alertBatchTitle: '',
             ids: [],
             selectedRowKeys: [],
-            statusText: ['', '待审核', '审核通过', '审核未通过'],
             addFlag: false,
             title: '审核'
         }
@@ -141,8 +115,6 @@ export default {
     computed: {
         ...mapState('setting', ['pageMinHeight']),
         columns() {
-            let { filteredInfo } = this;
-            filteredInfo = filteredInfo || {};
             const columns = [
                 {
                     title: '序号',
@@ -150,7 +122,7 @@ export default {
                     fixed: 'left',
                     dataIndex: 'index',
                     customRender: (text, record, index) => `${index + 1}`,
-                    width: 60
+                    width: 80
                 },
                 {
                     title: '标段编号',
@@ -160,34 +132,20 @@ export default {
                     title: '标段名称',
                     dataIndex: 'projectName',
                     ellipsis: true,
-                    width: 320
                 },
                 {
                     title: '上传人',
-                    dataIndex: 'createUser',
+                    dataIndex: 'createUserName',
                 },
                 {
                     title: '状态',
-                    dataIndex: 'status',
-                    scopedSlots: { customRender: 'status' },
-                    filters: [
-                        { text: '待审核', value: '1' },
-                        { text: '审核通过', value: '2' },
-                        { text: '审核未通过', value: '3' },
-                    ],
-                    filteredValue: filteredInfo.status || null,
-                    onFilter: (value, record) => record.status == value,
-                    filterIcon: () => (
-                        <a-icon type="filter" style={{ color: '#BFBFBF' }} />
-                    ),
-                    width: 100
+                    dataIndex: 'examineStatus',
+                    customRender: (text, record) => <span>{this.queryJsonBasicList.examineType.filter(item => item.code == record.examineStatus).map(item =>
+						item.name)}</span>,
                 },
                 {
                     title: '上传时间',
                     dataIndex: 'createTime',
-                    key: 'createTime',
-                    defaultSortOrder: 'ascend',
-                    sorter: (a, b) => a.createTime - b.createTime,
                     width: 180
                 },
                 {
@@ -286,7 +244,17 @@ export default {
         },
         // 审核
         examineBtn(record) {
-            this.$router.push({ path: '/reviewDetail', query: { id: record.id, type: 'examine' } })
+            this.showloadding(true)
+            reviewActionApi({id: record.id}).then(res => {
+                // 全局loading隐藏
+                this.showloadding(false)
+                const data = res.data
+                if (data.code == 200) {
+                    this.$router.push({ path: '/reviewDetail', query: { id: record.id, type: 'examine' } })
+                } else {
+                    this.$message.error(data.msg)
+                }
+            })
         },
         // 查看
         toViewBtn(record) {
@@ -297,12 +265,15 @@ export default {
 </script>
 <style lang="less" scoped>
 .bidSubproject {
+    width: 100%;
     height: 100%;
     margin: 18px;
     background-color: #fff;
 }
 
 .gutter-box {
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -422,6 +393,7 @@ export default {
 
 
 .content-box {
+    width: 100%;
     height: 100%;
     padding: 0 30px;
     background-color: #fff;

@@ -1,6 +1,6 @@
 <template>
     <div class="bidSubproject">
-        <div class="gutter-box">
+        <div class="gutter1-box">
             <div class="back-box" v-html="backText" @click="back"></div>
             <div class="process-box">
                 <div class="banner"></div>
@@ -15,7 +15,7 @@
                         <div class="file-box">
                             <span class="upload-icon"></span>
                             <span v-if="defaultData.projectFileAlias" class="desc">{{ defaultData.projectFileAlias
-                            }}.docx</span>
+                                }}.docx</span>
                             <span v-else class="desc">请选择所需的文件范本</span>
                             <a-button type="primary" size="small" style="font-size: 12px;"
                                 @click="selectFileModal">选择范本</a-button>
@@ -147,7 +147,7 @@ export default {
     },
     methods: {
         back() {
-            this.$router.push('/index')
+            this.$router.go(-1)
         },
         // 继续编制
         goOn() {
@@ -251,7 +251,7 @@ export default {
                     const data = res.data
                     if (data.code == 200) {
                         this.$message.success('操作成功')
-                        this.$router.push('/init')
+                        this.$router.push({ path: '/init', query: { id: data.data } })
                     } else {
                         this.$message.error(data.msg)
                     }
@@ -269,7 +269,7 @@ export default {
     background-color: #fff;
 }
 
-.gutter-box {
+.gutter1-box {
     height: 100%;
     display: flex;
     flex-direction: column;

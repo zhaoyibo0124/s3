@@ -1,6 +1,6 @@
 <template>
-    <div class="bidSubproject" :style="`min-height: ${pageMinHeight}px`">
-        <div class="gutter-box">
+    <div class="bidSubproject">
+        <div class="gutter1-box">
             <div class="serchInfo">
                 <a-form-model layout="inline" ref="ruleForm" :model="searchForm">
                     <a-form-model-item label="标段编号">
@@ -42,7 +42,6 @@
                         </div>
                         <div class="info">
                             <div class="name">{{ record.projectName }}</div>
-                            <!-- <div class="text">{{ record.archivesName }}</div> -->
                             <div class="code-info">
                                 <div class="code">{{ record.projectCode }}</div>
                                 <div class="type">{{queryJsonBasicList.projectClassify.filter(item =>
@@ -51,7 +50,14 @@
                             </div>
                             <div class="desc">
                                 <div class="time">编制时间:{{ record.createTime }}</div>
-                                <div class="actions" @click="handleClick(record)">下载文档</div>
+                                <div class="actions-box">
+                                    <div v-if="record.preparationStatus == 1" class="actions"
+                                        @click="handleGoOn(record)">继续编制</div>
+                                    <div v-if="record.preparationStatus == 2 && record.isSynchronize == 2"
+                                        class="actions" @click="handleExamine(record)">提交审核</div>
+                                    <div v-if="record.preparationStatus == 2" class="actions"
+                                        @click="handleClick(record)">下载文档</div>
+                                </div>
                             </div>
                         </div>
                     </li>
@@ -70,6 +76,7 @@ const BASE_URL = process.env.VUE_APP_API_BASE_URL
 import { mapState, mapMutations } from 'vuex'
 import {
     exaUseQueryListApi,
+    synchronizeApi
 } from '@/services/commentApiList'
 export default {
     data() {
@@ -98,7 +105,7 @@ export default {
                 projectScale: undefined,
                 examineStatus: '2',
             },
-            colors: ['待提交', '审核中', '审核通过', '审核未通过']
+            colors: ['', '编制中', '完成']
         }
     },
     computed: {
@@ -153,6 +160,40 @@ export default {
         },
         handleAdd() {
             this.$router.push('ai')
+        },
+        // 继续编制
+        handleGoOn(record) {
+            this.$router.push({ path: '/init', query: { id: record.id } })
+        },
+        // 提交审核
+        handleExamine(record) {
+            this.$confirm({
+                title: '确定要提交审核吗?',
+                onOk() {
+                    synchronizeApi({ id: record.id }).then(res => {
+                        const data = res.data
+                        if (data.code == 200) {
+                            this.$message.success('操作成功')
+                            this.handleSearch()
+                        } else {
+                            this.$message.error(data.msg)
+                        }
+                    })
+                },
+                onCancel() {
+                    console.log('Cancel');
+                },
+                class: 'test',
+            });
+
+        },
+        // 下载文档
+        handleClick(record) {
+            const BASE_URL = process.env.VUE_APP_API_BASE_URL;
+			// 模拟下载操作
+			let a = document.createElement('a')
+			a.href = `${BASE_URL}/examine/examine/exaTemplatePreparation/downTemplateFile?id=${record.id}`
+			a.click()
         }
     }
 }
@@ -164,11 +205,9 @@ export default {
     margin: 18px;
 }
 
-.gutter-box {
-    height: 890px;
-    padding-top: 0;
-    min-height: 800px;
-    overflow-y: auto;
+.gutter1-box {
+    display: flex;
+    flex-direction: column;
 
     .serchInfo {
         padding: 18px;
@@ -328,22 +367,28 @@ export default {
                             color: #999999;
                         }
 
-                        .actions {
-                            position: absolute;
-                            right: 0;
-                            padding: 5px 18px;
-                            border-radius: 3px;
-                            border: 1px solid #1F63D1;
-                            font-weight: 400;
-                            font-size: 12px;
-                            color: #1F63D1;
-                            cursor: pointer;
+                        .actions-box {
+                            display: flex;
+                            justify-content: flex-start;
+                            align-items: flex-end;
+
+                            .actions {
+                                margin-left: 10px;
+                                padding: 5px 18px;
+                                border-radius: 3px;
+                                border: 1px solid #1F63D1;
+                                font-weight: 400;
+                                font-size: 12px;
+                                color: #1F63D1;
+                                cursor: pointer;
+                            }
+
+                            .actions:hover {
+                                border: 1px solid rgb(64, 169, 255);
+                                color: rgb(64, 169, 255);
+                            }
                         }
 
-                        .actions:hover {
-                            border: 1px solid rgb(64, 169, 255);
-                            color: rgb(64, 169, 255);
-                        }
                     }
                 }
             }

@@ -1,87 +1,36 @@
 <template>
     <div class="bidSubproject">
+        <div class="back-box" v-html="backText" @click="back"></div>
         <div class="gutter-box">
-            <div class="left-box"></div>
+            <div class="left-box">
+               
+            </div>
             <div class="right-box">
                 <div class="red-text">*该招标文件共检查出{{ num }}类，累计{{ total }}处建议修复内容~</div>
                 <div class="type-box">
                     <a-icon type="left" style="font-size: 22px;color: #999;cursor: pointer;" @click="prevContent" />
                     <div class="type-data">
                         <div :class="['type-item', colors[index]]"
-                            v-for="item, index in types.slice((currentIndex - 1) * 4)" :key="index"
-                            @click="handleClick(item)">
-                            <span class="bt">{{ item.num }}<i>处</i></span>
-                            <span class="desc">{{ item.name }}</span>
+                            v-for="item, index in lists.slice((currentIndex - 1) * 4)" :key="index"
+                            @click="handleClick(item,index)">
+                            <span class="bt">{{ item.errorCount }}<i>处</i></span>
+                            <span class="desc">{{ item.classifyName }}</span>
                         </div>
                     </div>
                     <a-icon type="right" style="font-size: 22px;color: #999;cursor: pointer;" @click="nextContent" />
                 </div>
                 <div class="content-box">
                     <div class="content-height">
-                        <div :class="['content-item', colors[selectData.id]]">
+                        <div :class="['content-item', colors[selectIndex]]" v-for="error in errorList"
+                            :key="error.id">
                             <div class="desc">
-                                “污水沿污水管网汇至东疏港路主千管网通过提升泵站最终排至市政污水处理厂处理”中，
+                                {{ error.examineJudgmentContent }}
                             </div>
                             <div class="red-desc">
-                                “千管网通过提升”疑为错别字
+                                {{ error.examineResult }}
                             </div>
                             <div class="action">
-                                <div class="tips">建议修改为<i>“千管网通过提升”</i></div>
-                            </div>
-                        </div>
-                        <div :class="['content-item', colors[selectData.id]]">
-                            <div class="desc">
-                                “污水沿污水管网汇至东疏港路主千管网通过提升泵站最终排至市政污水处理厂处理”中，
-                            </div>
-                            <div class="red-desc">
-                                “千管网通过提升”疑为错别字
-                            </div>
-                            <div class="action">
-                                <div class="tips">建议修改为<i>“千管网通过提升”</i></div>
-                            </div>
-                        </div>
-                        <div :class="['content-item', colors[selectData.id]]">
-                            <div class="desc">
-                                “污水沿污水管网汇至东疏港路主千管网通过提升泵站最终排至市政污水处理厂处理”中，
-                            </div>
-                            <div class="red-desc">
-                                “千管网通过提升”疑为错别字
-                            </div>
-                            <div class="action">
-                                <div class="tips">建议修改为<i>“千管网通过提升”</i></div>
-                            </div>
-                        </div>
-                        <div :class="['content-item', colors[selectData.id]]">
-                            <div class="desc">
-                                “污水沿污水管网汇至东疏港路主千管网通过提升泵站最终排至市政污水处理厂处理”中，
-                            </div>
-                            <div class="red-desc">
-                                “千管网通过提升”疑为错别字
-                            </div>
-                            <div class="action">
-                                <div class="tips">建议修改为<i>“千管网通过提升”</i></div>
-                            </div>
-                        </div>
-                        <div :class="['content-item', colors[selectData.id]]">
-                            <div class="desc">
-                                “污水沿污水管网汇至东疏港路主千管网通过提升泵站最终排至市政污水处理厂处理”中，
-                            </div>
-                            <div class="red-desc">
-                                “千管网通过提升”疑为错别字
-                            </div>
-                            <div class="action">
-                                <div class="tips">建议修改为<i>“千管网通过提升”</i></div>
-                            </div>
-                        </div>
-                        <div :class="['content-item', colors[selectData.id]]">
-                            <div class="desc">
-                                “污水沿污水管网汇至东疏港路主千管网通过提升泵站最终排至市政污水处理厂处理”中，
-                            </div>
-                            <div class="red-desc">
-                                “千管网通过提升”疑为错别字
-                            </div>
-                            <div class="action">
-                                <div class="tips">建议修改为<i>“千管网通过提升”</i></div>
+                                <div class="tips">{{ error.examineRule }}</div>
                             </div>
                         </div>
                     </div>
@@ -99,38 +48,30 @@
                     </div>
                     <div class="examine-result" v-if="type == 'view'">
                         <div class="text-box" style="margin-top: 29px;">
-                            审核意见:啥啥名称啥啥名称啥啥名称啥啥名称啥啥名 啥啥名称啥啥名称啥啥名称啥啥
+                            审核意见:{{detailData.examineRemark}}
                         </div>
                         <div class="text-box">
-                            审核状态：审核通过、审核未通过
+                            审核状态：{{detailData.examineStatus==3?'审核通过':'审核未通过'}}
                         </div>
                         <div class="text-box">
-                            审核时间：2025-06-12 13:56
+                            审核时间：{{detailData.examineTime}}
                         </div>
                         <div class="text-box">
-                            审核人：张三
+                            审核人：{{detailData.examineUserName}}
                         </div>
                         <div class="text-box">
-                            创建人：李四
+                            创建人：{{detailData.createUserName}}
                         </div>
                         <div class="text-box">
-                            创建时间：2025-06-12 13:56
+                            创建时间：{{detailData.createTime}}
                         </div>
-                        <div class="btn-view">
+                        <!-- <div class="btn-view">
                             <a-button @click="handleRecord"
                                 style="width: 127px;border-color: #1F63D1;color: #1F63D1;">查看历史版本</a-button>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
-            <!-- <div class="right-box" v-if="type == 'examine' && !show">
-                <div class="content-box">
-
-                </div>
-            </div> -->
-            <!-- <div class="right-box" >
-                
-            </div> -->
         </div>
         <div class="btn-box" v-if="type != 'view'">
             <a-button style="margin-right:20px" @click="close">取消</a-button>
@@ -142,59 +83,40 @@
 <script>
 import {
     reviewDetailApi,
+    queryTypeListApi,
+    examineActionApi
 } from '@/services/commentApiList'
+
 export default {
     name: 'detailPage',
     data() {
         let self = this
         return {
+            backText: '<返回',
             type: self.$route.query.type,
             queryJsonBasicList: JSON.parse(sessionStorage.getItem('queryJsonBasicList')),		// 存储数据字典
-            num: 7,
-            total: 20,
-            types: [
-                {
-                    id: 0,
-                    name: '文件常规性',
-                    num: 3,
-                },
-                {
-                    id: 1,
-                    name: '时间节点合规性',
-                    num: 5,
-                },
-                {
-                    id: 2,
-                    name: '保证金合规性',
-                    num: 6,
-                },
-                {
-                    id: 3,
-                    name: '提交时间审核',
-                    num: 10,
-                },
-                {
-                    id: 4,
-                    name: '其他审核',
-                    num: 2,
-                }
-            ],
+            num: 0,
+            total: 0,
             colors: ['blue', 'orange', 'green', 'brown', 'purple'],
             currentIndex: 1,
-            selectData: {
-                id: 0
-            },
             show: false,
-            options: [{ label: '审核通过', value: 1 }, { label: '审核不通过', value: 2 }],
+            options: [{ label: '审核通过', value: 3 }, { label: '审核不通过', value: 4 }],
             examineStatus: '',
             reason: '',
-            detailData: {}
+            detailData: {},
+            errorList: [],
+            lists:[],
+            selectIndex:0
         }
     },
     created() {
         this.getDetail()
+        this.getList()
     },
     methods: {
+        back() {
+            this.$router.go(-1)
+        },
         // 获取详情
         getDetail() {
             reviewDetailApi({ id: this.$route.query.id }).then(res => {
@@ -206,6 +128,23 @@ export default {
                 }
             })
         },
+        // 获取右侧数据
+        getList() {
+            queryTypeListApi({ id: this.$route.query.id }).then(res => {
+                const data = res.data
+                if (data.code == 200) {
+                    this.lists = data.data
+                    this.total = data.data.reduce((accumulator, currentValue) => {
+                        return accumulator + Number(currentValue.errorCount);
+                    }, 0); // 初始值为0
+                    this.num = this.lists.length
+                    this.errorList = this.lists[0].errorList
+                } else {
+                    this.$message.error(data.msg)
+                }
+            })
+
+        },
         nextContent() {
             // 切换到下一个内容，如果已经是最后一个，则循环到第一个
             this.currentIndex = (this.currentIndex + 1) % this.types.length;
@@ -215,8 +154,9 @@ export default {
             this.currentIndex = (this.currentIndex - 1 + this.types.length) % this.types.length;
         },
         // 切换
-        handleClick(row) {
-            this.selectData = row
+        handleClick(row,index) {
+            this.errorList = row.errorList
+            this.selectIndex= index
         },
         // 关闭
         close() {
@@ -228,11 +168,15 @@ export default {
                 this.$message.warn('请选择审核意见')
                 return
             }
-            if (this.examineStatus == 2 && !this.reason) {
-                this.$message.warn('请填写审核备注')
-                return
-            }
-            this.$emit('confirmValue', '')
+            examineActionApi({ id: this.$route.query.id,examineRemark:this.reason,examineStatus:this.examineStatus }).then(res => {
+                const data = res.data
+                if (data.code == 200) {
+                    this.$message.success('操作成功')
+                     this.$router.go(-1)
+                } else {
+                    this.$message.error(data.msg)
+                }
+            })
         },
         // 查看历史版本
         handleRecord() {
@@ -249,6 +193,13 @@ export default {
     height: 100%;
     padding: 18px 18px 0 18px;
     background-color: #fff;
+
+    .back-box {
+        display: flex;
+        margin-top: 0px;
+        margin-bottom: 10px;
+        cursor: pointer;
+    }
 
     .gutter-box {
         display: flex;
@@ -391,6 +342,7 @@ export default {
                     margin-bottom: 9px;
 
                     .desc {
+                        width: 100%;
                         font-weight: 400;
                         font-size: 11px;
                         color: #000000;
@@ -408,6 +360,10 @@ export default {
                         font-weight: 400;
                         font-size: 11px;
                         color: #EB2323;
+                        display: -webkit-box;
+                        -webkit-line-clamp: 1;
+                        -webkit-box-orient: vertical;
+                        overflow: hidden;
 
                         &::after {
                             content: '';
@@ -431,7 +387,10 @@ export default {
                             font-weight: 400;
                             font-size: 11px;
                             color: #000000;
-
+                            display: -webkit-box;
+                        -webkit-line-clamp: 1;
+                        -webkit-box-orient: vertical;
+                        overflow: hidden;
                             i {
                                 font-style: normal;
                                 color: #1F63D1;

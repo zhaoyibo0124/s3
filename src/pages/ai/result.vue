@@ -1,5 +1,5 @@
 <template>
-    <div class="bidSubproject" :style="`min-height: ${pageMinHeight}px`">
+    <div class="bidSubproject">
         <div class="gutter-box">
             <img src="../../assets/img/icon-success.png" alt="">
             <span class="tip">编审完成</span>
