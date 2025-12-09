@@ -295,7 +295,7 @@ export default {
 
         .banner {
             width: 100%;
-            height: 111px;
+            height: 139px;
             background-image: url('../../assets/img/banner.png');
             background-size: contain;
             /* 或者使用 cover */

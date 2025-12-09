@@ -44,7 +44,7 @@ export default {
                 {
                     id: 2,
                     name: '文件审核',
-                    icon: require('../../assets/img/ai-icon.png'),
+                    icon: require('../../assets/img/file-icon.png'),
                     path: '/review',
                     selected: false
                 }
