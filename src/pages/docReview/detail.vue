@@ -3,7 +3,7 @@
         <div class="back-box" v-html="backText" @click="back"></div>
         <div class="gutter-box">
             <div class="left-box">
-               
+                <Wps ref="wps" v-if="show" :detailData="detailData" />
             </div>
             <div class="right-box">
                 <div class="red-text">*该招标文件共检查出{{ num }}类，累计{{ total }}处建议修复内容~</div>
@@ -12,7 +12,7 @@
                     <div class="type-data">
                         <div :class="['type-item', colors[index]]"
                             v-for="item, index in lists.slice((currentIndex - 1) * 4)" :key="index"
-                            @click="handleClick(item,index)">
+                            @click="handleClick(item, index)">
                             <span class="bt">{{ item.errorCount }}<i>处</i></span>
                             <span class="desc">{{ item.classifyName }}</span>
                         </div>
@@ -21,8 +21,7 @@
                 </div>
                 <div class="content-box">
                     <div class="content-height">
-                        <div :class="['content-item', colors[selectIndex]]" v-for="error in errorList"
-                            :key="error.id">
+                        <div :class="['content-item', colors[selectIndex]]" v-for="error in errorList" :key="error.id">
                             <div class="desc">
                                 {{ error.examineJudgmentContent }}
                             </div>
@@ -48,22 +47,22 @@
                     </div>
                     <div class="examine-result" v-if="type == 'view'">
                         <div class="text-box" style="margin-top: 29px;">
-                            审核意见:{{detailData.examineRemark}}
+                            审核意见:{{ detailData.examineRemark }}
                         </div>
                         <div class="text-box">
-                            审核状态：{{detailData.examineStatus==3?'审核通过':'审核未通过'}}
+                            审核状态：{{ detailData.examineStatus == 3 ? '审核通过' : '审核未通过' }}
                         </div>
                         <div class="text-box">
-                            审核时间：{{detailData.examineTime}}
+                            审核时间：{{ detailData.examineTime }}
                         </div>
                         <div class="text-box">
-                            审核人：{{detailData.examineUserName}}
+                            审核人：{{ detailData.examineUserName }}
                         </div>
                         <div class="text-box">
-                            创建人：{{detailData.createUserName}}
+                            创建人：{{ detailData.createUserName }}
                         </div>
                         <div class="text-box">
-                            创建时间：{{detailData.createTime}}
+                            创建时间：{{ detailData.createTime }}
                         </div>
                         <!-- <div class="btn-view">
                             <a-button @click="handleRecord"
@@ -81,6 +80,7 @@
 </template>
 
 <script>
+import Wps from '../../components/wps'
 import {
     reviewDetailApi,
     queryTypeListApi,
@@ -89,6 +89,9 @@ import {
 
 export default {
     name: 'detailPage',
+    components: {
+        Wps
+    },
     data() {
         let self = this
         return {
@@ -99,14 +102,14 @@ export default {
             total: 0,
             colors: ['blue', 'orange', 'green', 'brown', 'purple'],
             currentIndex: 1,
-            show: false,
             options: [{ label: '审核通过', value: 3 }, { label: '审核不通过', value: 4 }],
             examineStatus: '',
             reason: '',
             detailData: {},
             errorList: [],
-            lists:[],
-            selectIndex:0
+            lists: [],
+            selectIndex: 0,
+            show: false
         }
     },
     created() {
@@ -123,6 +126,7 @@ export default {
                 const data = res.data
                 if (data.code == 200) {
                     this.detailData = data.data
+                    this.show = true
                 } else {
                     this.$message.error(data.msg)
                 }
@@ -154,9 +158,9 @@ export default {
             this.currentIndex = (this.currentIndex - 1 + this.types.length) % this.types.length;
         },
         // 切换
-        handleClick(row,index) {
+        handleClick(row, index) {
             this.errorList = row.errorList
-            this.selectIndex= index
+            this.selectIndex = index
         },
         // 关闭
         close() {
@@ -168,11 +172,11 @@ export default {
                 this.$message.warn('请选择审核意见')
                 return
             }
-            examineActionApi({ id: this.$route.query.id,examineRemark:this.reason,examineStatus:this.examineStatus }).then(res => {
+            examineActionApi({ id: this.$route.query.id, examineRemark: this.reason, examineStatus: this.examineStatus }).then(res => {
                 const data = res.data
                 if (data.code == 200) {
                     this.$message.success('操作成功')
-                     this.$router.go(-1)
+                    this.$router.go(-1)
                 } else {
                     this.$message.error(data.msg)
                 }
@@ -388,9 +392,10 @@ export default {
                             font-size: 11px;
                             color: #000000;
                             display: -webkit-box;
-                        -webkit-line-clamp: 1;
-                        -webkit-box-orient: vertical;
-                        overflow: hidden;
+                            -webkit-line-clamp: 1;
+                            -webkit-box-orient: vertical;
+                            overflow: hidden;
+
                             i {
                                 font-style: normal;
                                 color: #1F63D1;
