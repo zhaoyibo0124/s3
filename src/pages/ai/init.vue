@@ -38,7 +38,6 @@
 </template>
 
 <script>
-
 import {
     infoEntryDetailApi,
     updatePreparationStatusApi
@@ -50,76 +49,14 @@ export default {
         Wps
     },
     data() {
-        // let self = this
         return {
             backText: '<返回',
             queryJsonBasicList: JSON.parse(sessionStorage.getItem('queryJsonBasicList')),		// 存储数据字典
             num: 7,
             total: 20,
-            types: [
-                {
-                    id: 0,
-                    name: '文件常规性',
-                    num: 3,
-                },
-                {
-                    id: 1,
-                    name: '时间节点合规性',
-                    num: 5,
-                },
-                {
-                    id: 2,
-                    name: '保证金合规性',
-                    num: 6,
-                },
-                {
-                    id: 3,
-                    name: '提交时间审核',
-                    num: 10,
-                },
-                {
-                    id: 4,
-                    name: '其他审核',
-                    num: 2,
-                }
-            ],
             colors: ['blue', 'orange', 'green', 'brown', 'purple'],
-            currentIndex: 1,
-            selectData: {
-                id: 0
-            },
-            items: [
-                {
-                    label: '商务条款内容商务条款内容商务条款，内容商务条款内容商务条款内容商务条款内容商务条款内容。商务条款内容，商务条款内容商务条款内容商务条款内容。',
-                    value: 1
-                },
-                {
-                    label: '模糊查询结果标题模糊查询结果标题模糊查询结果',
-                    value: 2
-                },
-                {
-                    label: '哈哈',
-                    value: 3
-                },
-                {
-                    label: '商务条款内容商务条款内容商务条款，内容商务条款内容商务条款内容商务条款内容商务条款内容。商务条款内容，商务条款内容商务条款内容商务条款内容。',
-                    value: 4
-                },
-                {
-                    label: '模糊查询结果标题模糊查询结果标题模糊查询结果',
-                    value: 5
-                },
-                {
-                    label: '哈哈',
-                    value: 6
-                },
-                {
-                    label: '商务条款内容商务条款内容商务条款，内容商务条款内容商务条款内容商务条款内容商务条款内容。商务条款内容，商务条款内容商务条款内容商务条款内容。',
-                    value: 7
-                },
-            ],
             detailData: {},
-            show:false
+            show: false,
         }
     },
     computed: {
@@ -127,6 +64,7 @@ export default {
     },
     created() {
         this.getDetail()
+
     },
     methods: {
         ...mapMutations('setting', ['showloadding']),
@@ -141,32 +79,12 @@ export default {
                 this.showloadding(false)
                 const data = res.data
                 if (data.code == 200) {
-                    this.detailData = data.data
+                    this.detailData = data.data         
                     this.show = true
                 } else {
                     this.$message.error(data.msg)
                 }
             })
-        },
-        nextContent() {
-            // 切换到下一个内容，如果已经是最后一个，则循环到第一个
-            this.currentIndex = (this.currentIndex + 1) % this.types.length;
-        },
-        prevContent() {
-            // 切换到前一个内容，如果已经是第一个，则循环到最后一个
-            this.currentIndex = (this.currentIndex - 1 + this.types.length) % this.types.length;
-        },
-        // 切换
-        handleClick(row) {
-            this.selectData = row
-        },
-        // 替换
-        handleReplace() {
-
-        },
-        // 忽略
-        handleIgnore() {
-
         },
         // 生成正文
         submit() {
@@ -187,13 +105,13 @@ export default {
             })
         },
         // 
-        AppletFullEdit(){
+        AppletFullEdit() {
             this.$refs.wps.AppletFullEdit()
         },
-        SaveFile(){
+        SaveFile() {
             this.$refs.wps.SaveFile()
         }
-        
+
     },
 }
 </script>
@@ -205,15 +123,18 @@ export default {
     height: 100%;
     padding: 18px 0px 0 18px;
     background-color: #fff;
+
     .back-box {
         display: flex;
         margin-top: 0px;
         margin-bottom: 10px;
         cursor: pointer;
     }
+
     .gutter-box {
         display: flex;
         margin-right: 0px;
+
         .left-box {
             display: flex;
             // width: calc(100% - 489px);
