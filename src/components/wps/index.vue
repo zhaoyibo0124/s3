@@ -42,7 +42,7 @@ export default {
             StartSecond: 0, // 是否启动了第二个网页组件实例
             ReStartLoad: 0, // 第一个网页组件实例是否重新打开状态
             width: 1200,		// 网页组件窗口显示宽度
-            height: 640,	// 网页组件窗口显示高度
+            height: 800,	// 网页组件窗口显示高度
             left: 0,		// 网页组件窗口以网页左上角为基点显示的X位置
             top: 100,			// 网页组件窗口以网页左上角为基点显示的Y位置
             IframeX: -10, 	// 网页组件窗口模拟iFrame用的X坐标
@@ -68,7 +68,7 @@ export default {
     },
 
     mounted() {
-        // this.ServerOpenFile = `http://192.168.100.102:10701${this.detailData.projectFileUrl}${this.detailData.projectFileName}${this.detailData.projectFileType}`
+        this.ServerOpenFile = `http://192.168.100.102:10701${this.detailData.projectFileUrl}${this.detailData.projectFileName}${this.detailData.projectFileType}`
         //初始化配置
         this.init()
         /// 响应改变浏览器窗口大小
