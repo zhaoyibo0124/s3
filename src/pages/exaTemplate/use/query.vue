@@ -4,6 +4,62 @@
 			<div class="serchInfo">
 				<div :class="advanced ? 'search' : null" v-if="operation.find">
 					<a-form-model layout="inline" ref="ruleForm" :model="searchForm">
+						<a-form-model-item label="项目类型">
+							<a-select v-model="searchForm.projectType" placeholder="请选择" style="width: 174px;">
+								<a-select-option v-for="(item, index) in queryJsonBasicList.projectType"
+									:value="item.code" :key="index">
+									{{ item.name }}
+								</a-select-option>
+							</a-select>
+						</a-form-model-item>
+						<a-form-model-item label="项目类别">
+							<a-select v-model="searchForm.projectCategory" placeholder="请选择" style="width: 174px;">
+								<a-select-option v-for="(item, index) in queryJsonBasicList.projectCategory"
+									:value="item.code" :key="index">
+									{{ item.name }}
+								</a-select-option>
+							</a-select>
+						</a-form-model-item>
+						<a-form-model-item label="项目规模">
+							<a-select v-model="searchForm.projectScale" placeholder="请选择" style="width: 174px;">
+								<a-select-option v-for="(item, index) in queryJsonBasicList.projectScale"
+									:value="item.code" :key="index">
+									{{ item.name }}
+								</a-select-option>
+							</a-select>
+						</a-form-model-item>
+						<a-form-model-item label="项目分类">
+							<a-select v-model="searchForm.projectClassify" placeholder="请选择" style="width: 174px;">
+								<a-select-option v-for="(item, index) in queryJsonBasicList.projectClassify"
+									:value="item.code" :key="index">
+									{{ item.name }}
+								</a-select-option>
+							</a-select>
+						</a-form-model-item>
+						<a-form-model-item label="资金来源">
+							<a-select v-model="searchForm.projectFundSource" placeholder="请选择" style="width: 174px;">
+								<a-select-option v-for="(item, index) in queryJsonBasicList.fundSource"
+									:value="item.code" :key="index">
+									{{ item.name }}
+								</a-select-option>
+							</a-select>
+						</a-form-model-item>
+						<a-form-model-item label="编制状态">
+							<a-select v-model="searchForm.preparationStatus" placeholder="请选择" style="width: 174px;">
+								<a-select-option v-for="(item, index) in queryJsonBasicList.preparationStatus"
+									:value="item.code" :key="index">
+									{{ item.name }}
+								</a-select-option>
+							</a-select>
+						</a-form-model-item>
+						<a-form-model-item label="同步状态">
+							<a-select v-model="searchForm.isSynchronize" placeholder="请选择" style="width: 174px;">
+								<a-select-option v-for="(item, index) in queryJsonBasicList.synchronizeType"
+									:value="item.code" :key="index">
+									{{ item.name }}
+								</a-select-option>
+							</a-select>
+						</a-form-model-item>
 						<a-form-model-item label="数据状态">
 							<a-select v-model="searchForm.isDelete" placeholder="请选择" style="width: 174px;">
 								<a-select-option v-for="(item, index) in queryJsonBasicList.dataType" :value="item.code"
@@ -23,7 +79,7 @@
 			</div>
 			<a-card v-if="operation.table">
 				<a-table :columns="columns" :dataSource="dataSource" :loading="tableLoading"
-					:rowKey="(record) => { return record.id }" :pagination="tablePagination">
+					:rowKey="(record) => { return record.id }" :pagination="tablePagination" :scroll="{ x: 1400 }">
 					<div slot="action" slot-scope="text, record">
 						<a-space>
 							<a-button type="link" @click="toDownBtn(record)">
@@ -40,6 +96,7 @@
 import { mapState, mapMutations } from 'vuex'
 import {
 	exaUseQueryListApi,
+	modelListApi,
 	PowerFindPowerOperation
 } from '@/services/commentApiList'
 export default {
@@ -58,18 +115,18 @@ export default {
 					width: 100
 				},
 				{
-					title: '项目规模',
-					dataIndex: 'projectScale',
-					customRender: (text, record) => <span>{this.queryJsonBasicList.projectScale.filter(item => item.code == record.projectScale).map(item =>
-						item.name)}</span>,
-					width: 100
+					title: '项目编号',
+					dataIndex: 'projectCode',
+					ellipsis: true,
+					width: 180,
+					customRender: (text, record) => <a-tooltip placement="topLeft" title={record.projectCode}>{record.projectCode}</a-tooltip>
 				},
 				{
-					title: '项目类别',
-					dataIndex: 'projectCategory',
-					customRender: (text, record) => <span>{this.queryJsonBasicList.projectCategory.filter(item => item.code == record.projectCategory).map(item =>
-						item.name)}</span>,
-					width: 120
+					title: '项目名称',
+					dataIndex: 'projectName',
+					ellipsis: true,
+					width: 180,
+					customRender: (text, record) => <a-tooltip placement="topLeft" title={record.projectName}>{record.projectName}</a-tooltip>
 				},
 				{
 					title: '项目类型',
@@ -79,22 +136,62 @@ export default {
 					width: 140
 				},
 				{
-					title: '终止规则',
-					dataIndex: 'terminationRule',
-					ellipsis: true,
-					width: 180,
-					customRender: (text, record) => <a-tooltip placement="topLeft" title={record.terminationRule}>{record.terminationRule}</a-tooltip>
+					title: '项目类别',
+					dataIndex: 'projectCategory',
+					customRender: (text, record) => <span>{this.queryJsonBasicList.projectCategory.filter(item => item.code == record.projectCategory).map(item =>
+						item.name)}</span>,
+					width: 120
+				},
+				{
+					title: '项目规模',
+					dataIndex: 'projectScale',
+					customRender: (text, record) => <span>{this.queryJsonBasicList.projectScale.filter(item => item.code == record.projectScale).map(item =>
+						item.name)}</span>,
+					width: 100
 				},
 				{
 					title: '范本名称',
-					dataIndex: 'templateName',
+					dataIndex: 'templateId',
+					customRender: (text, record) => <a-tooltip placement="topLeft" title={
+						this.modelOptions.filter(item => item.id == record.templateId).map(item =>
+							item.templateName)
+					}>{this.modelOptions.filter(item => item.id == record.templateId).map(item =>
+						item.templateName)}</a-tooltip>,
 					ellipsis: true,
-					width: 180,
-					customRender: (text, record) => <a-tooltip placement="topLeft" title={record.templateName}>{record.templateName}</a-tooltip>
+					width: 300,
+				},
+				{
+					title: '项目分类',
+					dataIndex: 'projectClassify',
+					customRender: (text, record) => <span>{this.queryJsonBasicList.projectClassify.filter(item => item.code == record.projectClassify).map(item =>
+						item.name)}</span>,
+					width: 140
+				},
+				{
+					title: '资金来源',
+					dataIndex: 'projectFundSource',
+					customRender: (text, record) => <span>{this.queryJsonBasicList.fundSource.filter(item => item.code == record.projectFundSource).map(item =>
+						item.name)}</span>,
+					width: 140
+				},
+				{
+					title: '编制状态',
+					dataIndex: 'preparationStatus',
+					customRender: (text, record) => <span>{this.queryJsonBasicList.preparationStatus.filter(item => item.code == record.preparationStatus).map(item =>
+						item.name)}</span>,
+					width: 140
+				},
+				{
+					title: '同步状态',
+					dataIndex: 'isSynchronize',
+					customRender: (text, record) => <span>{this.queryJsonBasicList.synchronizeType.filter(item => item.code == record.isSynchronize).map(item =>
+						item.name)}</span>,
+					width: 140
 				},
 				{
 					title: '创建人',
 					dataIndex: 'createUserName',
+					width: 180,
 				},
 				{
 					title: '操作',
@@ -117,6 +214,11 @@ export default {
 			},
 			advanced: true,
 			searchForm: {
+				projectType: undefined,
+				projectCategory: undefined,
+				projectScale: undefined,
+				preparationStatus: undefined,
+				isSynchronize: undefined,
 				isDelete: undefined
 			},
 			operation: {
@@ -132,6 +234,7 @@ export default {
 			alertFlag: false,
 			alertTitle: '',
 			defaultData: {},
+			modelOptions: [],
 		}
 	},
 	computed: {
@@ -139,6 +242,7 @@ export default {
 	},
 	created: function () {
 		this.findPowerOperation()
+		this.getModelOptions()
 	},
 	methods: {
 		...mapMutations('setting', ['showloadding']),
@@ -166,6 +270,20 @@ export default {
 				}
 			})
 		},
+		getModelOptions() {
+			const data = {
+				pageNo: -1,
+				pageSize: -1
+			}
+			modelListApi(data).then(res => {
+				const data = res.data
+				if (data.code == 200) {
+					this.modelOptions = data.data.list
+				} else {
+					this.$message.error(data.msg)
+				}
+			})
+		},
 		// 获取列表
 		queryListData(page, pageSize) {
 			if (page) {
@@ -174,6 +292,7 @@ export default {
 			// 全局loading显示
 			this.showloadding(true)
 			const data = {
+				...this.searchForm,
 				pageNo: page == undefined ? this.tablePagination.defaultCurrent : page,
 				pageSize: pageSize == undefined ? this.tablePagination.defaultPageSize : pageSize
 			}
@@ -199,7 +318,14 @@ export default {
 		// 重置
 		handleReset() {
 			// 清空表单
-			this.searchForm.isDelete = undefined
+			this.searchForm = {
+				projectType: undefined,
+				projectCategory: undefined,
+				projectScale: undefined,
+				preparationStatus: undefined,
+				isSynchronize: undefined,
+				isDelete:undefined
+			}
 			if (this.operation.queryList) {
 				this.queryListData(this.tablePagination.defaultCurrent, this.tablePagination.defaultPageSize)
 			}

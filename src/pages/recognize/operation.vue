@@ -15,20 +15,20 @@
 			<a-form-model-item label="规则名称" prop="ruleName">
 				<a-input v-model="form.ruleName" placeholder="请输入" :disabled="title == '查看'" />
 			</a-form-model-item>
-			<a-form-model-item label="规则类型" prop="ruleType">
-				<a-radio-group v-model="form.ruleType" :disabled="title == '查看'">
-					<a-radio :value="item.code" v-for="item in queryJsonBasicList.extractType" :key="item.code">
+			<a-form-model-item label="是否调用模型" prop="isCallModel">
+				<a-radio-group v-model="form.isCallModel" :disabled="title == '查看'">
+					<a-radio :value="item.code" v-for="item in queryJsonBasicList.yesNoType" :key="item.code">
 						{{ item.name }}
 					</a-radio>
 				</a-radio-group>
 			</a-form-model-item>
-			<a-form-model-item v-if="form.ruleType==2" label="模型名称" prop="modelName">
+			<a-form-model-item v-if="form.isCallModel==1" label="模型名称" prop="modelName">
 				<a-input v-model="form.modelName" placeholder="请输入" :disabled="title == '查看'" />
 			</a-form-model-item>
-			<a-form-model-item v-if="form.ruleType==2" label="模型地址" prop="modelUrl">
+			<a-form-model-item v-if="form.isCallModel==1" label="模型地址" prop="modelUrl">
 				<a-input v-model="form.modelUrl" placeholder="请输入" :disabled="title == '查看'" />
 			</a-form-model-item>
-			<a-form-model-item v-if="form.ruleType==2" label="模型提示词" prop="modelPrompt">
+			<a-form-model-item v-if="form.isCallModel==1" label="模型提示词" prop="modelPrompt">
 				<a-input v-model="form.modelPrompt" placeholder="请输入" :disabled="title == '查看'" />
 			</a-form-model-item>
 		</a-form-model>
@@ -36,8 +36,8 @@
 </template>
 <script>
 import {
-	basicLogicAddApi,
-	basicLogicUpdateApi
+	recognizeAddApi,
+	recognizeUpdateApi
 } from '@/services/commentApiList'
 export default {
 	name: 'addAlert',
@@ -55,7 +55,7 @@ export default {
 				modelPrompt: '',
 				modelUrl: '',
 				ruleName: '',
-				ruleType: undefined
+				isCallModel: undefined
 			},
 			rules: {
 				modelName: [
@@ -70,8 +70,8 @@ export default {
 				ruleName: [
 					{ required: true, message: '请输入规则名称', trigger: 'blur' },
 				],
-				ruleType: [
-					{ required: true, message: '请选择规则类型', trigger: 'change' },
+				isCallModel: [
+					{ required: true, message: '请选择是否调用模型', trigger: 'change' },
 				],
 			}
 		}
@@ -92,7 +92,7 @@ export default {
 					if (this.title == '新增') {
 						const data = JSON.parse(JSON.stringify(this.form))
 						delete data.id
-						basicLogicAddApi(data).then(res => {
+						recognizeAddApi(data).then(res => {
 							this.handleOkLoading = false
 							const data = res.data
 							if (data.code == 200) {
@@ -104,7 +104,7 @@ export default {
 						})
 					} else if (this.title == '编辑') {
 						const data = JSON.parse(JSON.stringify(this.form))
-						basicLogicUpdateApi(data).then(res => {
+						recognizeUpdateApi(data).then(res => {
 							this.handleOkLoading = false
 							const data = res.data
 							if (data.code == 200) {

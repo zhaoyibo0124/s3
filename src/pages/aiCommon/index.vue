@@ -72,13 +72,13 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 48px;
+    padding-top: 64px;
     background: #F2F2F2;
 
     .left-menu {
         position: fixed;
         left: 0;
-        top: 48px;
+        top: 64px;
         display: flex;
         flex-direction: column;
         align-items: flex-start;

@@ -41,11 +41,23 @@
                             <img :src="`${BASE_URL}/examine${record.projectCovertFile}`" alt="">
                         </div>
                         <div class="info">
-                            <div class="name">{{ record.projectName }}</div>
+                            <div class="name">标段名称:{{ record.projectName }}</div>
                             <div class="code-info">
-                                <div class="code">{{ record.projectCode }}</div>
+                                <div class="code">标段编号:{{ record.projectCode }}</div>
+                                <div class="type">{{queryJsonBasicList.projectType.filter(item =>
+                                    item.code == record.projectType).map(item =>
+                                        item.name).toString()}}</div>
+                                <div class="type">{{queryJsonBasicList.projectCategory.filter(item =>
+                                    item.code == record.projectCategory).map(item =>
+                                        item.name).toString()}}</div>
+                                <div class="type">{{queryJsonBasicList.projectScale.filter(item =>
+                                    item.code == record.projectScale).map(item =>
+                                        item.name).toString()}}</div>
                                 <div class="type">{{queryJsonBasicList.projectClassify.filter(item =>
                                     item.code == record.projectClassify).map(item =>
+                                        item.name).toString()}}</div>
+                                <div class="type">{{queryJsonBasicList.fundSource.filter(item =>
+                                    item.code == record.projectFundSource).map(item =>
                                         item.name).toString()}}</div>
                             </div>
                             <div class="desc">
@@ -100,10 +112,7 @@ export default {
             searchForm: {
                 projectName: '',
                 projectCode: '',
-                projectCategory: undefined,
-                projectType: undefined,
-                projectScale: undefined,
-                examineStatus: '2',
+                // examineStatus: '2',
             },
             colors: ['', '编制中', '完成']
         }
@@ -151,10 +160,10 @@ export default {
             this.searchForm = {
                 projectName: '',
                 projectCode: '',
-                projectCategory: undefined,
-                projectType: undefined,
-                projectScale: undefined,
-                examineStatus: '2',
+                // projectCategory: undefined,
+                // projectType: undefined,
+                // projectScale: undefined,
+                // examineStatus: '2',
             }
             this.queryListData(this.tablePagination.defaultCurrent, this.tablePagination.defaultPageSize)
         },

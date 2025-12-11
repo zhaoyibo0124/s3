@@ -4,8 +4,35 @@
 			<div class="serchInfo">
 				<div :class="advanced ? 'search' : null" v-if="operation.find">
 					<a-form-model layout="inline" ref="ruleForm" :model="searchForm">
+						<a-form-model-item label="范本名称">
+							<a-input v-model="searchForm.templateName" placeholder="请输入" />
+						</a-form-model-item>
+						<a-form-model-item label="项目类型">
+							<a-select v-model="searchForm.projectType" placeholder="请选择" style="width: 180px">
+								<a-select-option v-for="(item, index) in queryJsonBasicList.projectType"
+									:value="item.code" :key="index">
+									{{ item.name }}
+								</a-select-option>
+							</a-select>
+						</a-form-model-item>
+						<a-form-model-item label="项目类别">
+							<a-select v-model="searchForm.projectCategory" placeholder="请选择" style="width: 180px">
+								<a-select-option v-for="(item, index) in queryJsonBasicList.projectCategory"
+									:value="item.code" :key="index">
+									{{ item.name }}
+								</a-select-option>
+							</a-select>
+						</a-form-model-item>
+						<a-form-model-item label="项目规模">
+							<a-select v-model="searchForm.projectScale" placeholder="请选择" style="width: 180px">
+								<a-select-option v-for="(item, index) in queryJsonBasicList.projectScale"
+									:value="item.code" :key="index">
+									{{ item.name }}
+								</a-select-option>
+							</a-select>
+						</a-form-model-item>
 						<a-form-model-item label="数据状态">
-							<a-select v-model="searchForm.isDelete" placeholder="请选择" style="width: 174px;">
+							<a-select v-model="searchForm.isDelete" placeholder="请选择" style="width: 180px">
 								<a-select-option v-for="(item, index) in queryJsonBasicList.dataType" :value="item.code"
 									:key="index">
 									{{ item.name }}
@@ -87,18 +114,11 @@ export default {
 					width: 100
 				},
 				{
-					title: '项目规模',
-					dataIndex: 'projectScale',
-					customRender: (text, record) => <span>{this.queryJsonBasicList.projectScale.filter(item => item.code == record.projectScale).map(item =>
-						item.name)}</span>,
-					width: 100
-				},
-				{
-					title: '项目类别',
-					dataIndex: 'projectCategory',
-					customRender: (text, record) => <span>{this.queryJsonBasicList.projectCategory.filter(item => item.code == record.projectCategory).map(item =>
-						item.name)}</span>,
-					width: 120
+					title: '范本名称',
+					dataIndex: 'templateName',
+					ellipsis: true,
+					width: 180,
+					customRender: (text, record) => <a-tooltip placement="topLeft" title={record.templateName}>{record.templateName}</a-tooltip>
 				},
 				{
 					title: '项目类型',
@@ -108,19 +128,27 @@ export default {
 					width: 140
 				},
 				{
+					title: '项目类别',
+					dataIndex: 'projectCategory',
+					customRender: (text, record) => <span>{this.queryJsonBasicList.projectCategory.filter(item => item.code == record.projectCategory).map(item =>
+						item.name)}</span>,
+					width: 120
+				},
+				{
+					title: '项目规模',
+					dataIndex: 'projectScale',
+					customRender: (text, record) => <span>{this.queryJsonBasicList.projectScale.filter(item => item.code == record.projectScale).map(item =>
+						item.name)}</span>,
+					width: 100
+				},
+				{
 					title: '终止规则',
 					dataIndex: 'terminationRule',
 					ellipsis: true,
 					width: 180,
 					customRender: (text, record) => <a-tooltip placement="topLeft" title={record.terminationRule}>{record.terminationRule}</a-tooltip>
 				},
-				{
-					title: '范本名称',
-					dataIndex: 'templateName',
-					ellipsis: true,
-					width: 180,
-					customRender: (text, record) => <a-tooltip placement="topLeft" title={record.templateName}>{record.templateName}</a-tooltip>
-				},
+
 				{
 					title: '操作',
 					dataIndex: 'action',
@@ -142,6 +170,10 @@ export default {
 			},
 			advanced: true,
 			searchForm: {
+				templateName: '',
+				projectType: undefined,
+				projectCategory: undefined,
+				projectScale: undefined,
 				isDelete: undefined
 			},
 			operation: {
@@ -199,7 +231,7 @@ export default {
 			// 全局loading显示
 			this.showloadding(true)
 			const data = {
-				isDelete: this.searchForm.isDelete,
+				...this.searchForm,
 				pageNo: page == undefined ? this.tablePagination.defaultCurrent : page,
 				pageSize: pageSize == undefined ? this.tablePagination.defaultPageSize : pageSize
 			}
@@ -229,7 +261,13 @@ export default {
 		// 重置
 		handleReset() {
 			// 清空表单
-			this.searchForm.isDelete = undefined
+			this.searchForm = {
+				templateName: '',
+				projectType: undefined,
+				projectCategory: undefined,
+				projectScale: undefined,
+				isDelete: undefined
+			}
 			if (this.operation.queryList) {
 				this.queryListData(this.tablePagination.defaultCurrent, this.tablePagination.defaultPageSize)
 			}

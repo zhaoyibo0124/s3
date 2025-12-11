@@ -59,14 +59,14 @@
 import { mapState, mapMutations } from 'vuex'
 import infoAlert from './operation.vue'
 import {
-	recognizeDeleteApi,
-	recognizeDisableApi,
-	recognizeRecoveryApi,
-	recognizeQueryListApi,
+	basicLogicDeleteApi,
+	basicLogicDisableApi,
+	basicLogicRecoveryApi,
+	basicLogicQueryListApi,
 	PowerFindPowerOperation
 } from '@/services/commentApiList'
 export default {
-	name: 'recognizePage',
+	name: 'basicLogicPage',
 	components: {
 		infoAlert
 	},
@@ -199,7 +199,7 @@ export default {
 				pageNo: page == undefined ? this.tablePagination.defaultCurrent : page,
 				pageSize: pageSize == undefined ? this.tablePagination.defaultPageSize : pageSize
 			}
-			recognizeQueryListApi(data).then(res => {
+			basicLogicQueryListApi(data).then(res => {
 				// 全局loading隐藏
 				this.showloadding(false)
 				const data = res.data
@@ -272,7 +272,7 @@ export default {
 					const data = {
 						id: record.id
 					}
-					recognizeDeleteApi(data).then(res => {
+					basicLogicDeleteApi(data).then(res => {
 						const data = res.data
 						if (data.code == 200) {
 							if (that.operation.queryList) {
@@ -300,7 +300,7 @@ export default {
 					const data = {
 						id: record.id
 					}
-					recognizeDisableApi(data).then(res => {
+					basicLogicDisableApi(data).then(res => {
 						const data = res.data
 						if (data.code == 200) {
 							if (that.operation.queryList) {
@@ -328,7 +328,7 @@ export default {
 					const data = {
 						id: record.id
 					}
-					recognizeRecoveryApi(data).then(res => {
+					basicLogicRecoveryApi(data).then(res => {
 						const data = res.data
 						if (data.code == 200) {
 							if (that.operation.queryList) {

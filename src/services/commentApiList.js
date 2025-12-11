@@ -447,8 +447,39 @@ import {
   recognizeUpdate,
   recognizeAdd,
   queryTypeList,
-  examineAction
+  examineAction,
+  exaProjectQueryList,
+  exaProjectDelete,
+  exaProjectDisable,
+  exaProjectRecovery,
+  exaProjectUpdate,
+  exaProjectAdd,
 } from "@/services/api";
+export async function exaProjectQueryListApi(data) {
+  return request(exaProjectQueryList, METHOD.POST, data);
+}
+export async function exaProjectDeleteApi(data) {
+  return request(exaProjectDelete, METHOD.POST, data);
+}
+export async function exaProjectDisableApi(data) {
+  return request(exaProjectDisable, METHOD.POST, data);
+}
+export async function exaProjectRecoveryApi(data) {
+  return request(exaProjectRecovery, METHOD.POST, data);
+}
+export async function exaProjectUpdateApi(data) {
+  return request(exaProjectUpdate, METHOD.POST, data);
+}
+export async function exaProjectAddApi(data) {
+  return request(exaProjectAdd, METHOD.POST, data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+}
+
+
+
 export async function examineActionApi(data) {
   return request(examineAction, METHOD.POST, data);
 }

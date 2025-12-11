@@ -571,6 +571,14 @@ module.exports = {
 	// 文件审核列表
 	reviewQueryList:`${BASE_URL}/examine/examine/exaProject/queryList`,
 	reviewDetail:`${BASE_URL}/examine/examine/exaProject/findById`,
+	exaProjectQueryList:`${BASE_URL}/examine/examine/exaProject/queryList`,
+	exaProjectDelete:`${BASE_URL}/examine/examine/exaProject/delete`,
+	exaProjectDisable:`${BASE_URL}/examine/examine/exaProject/disable`,
+	exaProjectRecovery:`${BASE_URL}/examine/examine/exaProject/recovery`,
+	exaProjectUpdate:`${BASE_URL}/examine/examine/exaProject/update`,
+	exaProjectAdd:`${BASE_URL}/examine/examine/exaProject/addProjectFile`,
+
+
 	// 文件审核-审核操作
 	reviewAction:`${BASE_URL}/examine/examine/review/review`,
 	//引用范本编制信息-上传文档
@@ -591,7 +599,7 @@ module.exports = {
 	recognizeDisable:`${BASE_URL}/examine/examine/wriRecognizeRule/disable`,
 	recognizeRecovery:`${BASE_URL}/examine/examine/wriRecognizeRule/recovery`,
 	recognizeUpdate:`${BASE_URL}/examine/examine/wriRecognizeRule/update`,
-	recognizeUpload:`${BASE_URL}/examine/examine/wriRecognizeRule/add`,
+	recognizeAdd:`${BASE_URL}/examine/examine/wriRecognizeRule/add`,
 	// 分类查询审核记录
 	queryTypeList:`${BASE_URL}/examine/examine/exaProjectExamine/queryTypeList`,
 	// 审核通过或拒绝

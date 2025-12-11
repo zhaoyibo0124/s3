@@ -6,14 +6,14 @@
                     <a-form-model layout="inline" ref="ruleForm" :model="searchForm">
                         <a-form-model-item label="标段名称">
                             <a-input placeholder="请输入" v-model="searchForm.projectName" allowClear
-                                style="width: 180px;" />
+                                style="width: 174px;" />
                         </a-form-model-item>
                         <a-form-model-item label="标段编号">
                             <a-input placeholder="请输入" v-model="searchForm.projectCode" allowClear
-                                style="width: 180px;" />
+                                style="width: 174px;" />
                         </a-form-model-item>
                         <a-form-model-item label="审核状态">
-                            <a-select v-model="searchForm.status" placeholder="请选择" style="width: 150px;">
+                            <a-select v-model="searchForm.examineStatus" placeholder="请选择" style="width: 150px;">
                                 <a-select-option v-for="item, index in queryJsonBasicList.examineType" :key="index"
                                     :value="item.code">{{ item.name }}</a-select-option>
                             </a-select>
@@ -26,10 +26,10 @@
                             </a-select>
                         </a-form-model-item> -->
                         <a-form-model-item label="审核日期">
-                            <a-range-picker v-model="searchForm.dateRange" :placeholder="['请选择', '请选择']"
-                                @change="onChange" style="width: 230px;" />
+                            <a-range-picker v-model="dateRange" :placeholder="['开始时间', '结束时间']" @change="onChange"
+                                style="width: 240px;" />
                         </a-form-model-item>
-                        <a-form-model-item style="margin-left: 60px;">
+                        <a-form-model-item>
                             <span style="display: inline-block;">
                                 <a-button type="primary" @click="handleSearch">查询</a-button>
                                 <a-button style="margin-left: 10px" @click="handleReset">重置</a-button>
@@ -77,9 +77,7 @@ export default {
             searchForm: {
                 projectName: '',
                 projectCode: '',
-                status: undefined,
-                projectType: undefined,
-                dateRange: [],
+                examineStatus: undefined,
                 startTime: '',
                 endTime: ''
             },
@@ -109,7 +107,8 @@ export default {
             ids: [],
             selectedRowKeys: [],
             addFlag: false,
-            title: '审核'
+            title: '审核',
+            dateRange: [],
         }
     },
     computed: {
@@ -141,7 +140,7 @@ export default {
                     title: '状态',
                     dataIndex: 'examineStatus',
                     customRender: (text, record) => <span>{this.queryJsonBasicList.examineType.filter(item => item.code == record.examineStatus).map(item =>
-						item.name)}</span>,
+                        item.name)}</span>,
                 },
                 {
                     title: '上传时间',
@@ -188,7 +187,6 @@ export default {
         //     })
         // },
         onSelectChange(selectedRowKeys) {
-            console.log('selectedRowKeys changed: ', selectedRowKeys);
             this.selectedRowKeys = selectedRowKeys;
         },
         onChange(date, dateString) {
@@ -232,12 +230,13 @@ export default {
         handleReset() {
             // 清空表单
             this.searchForm = {
-                archivesName: '',
+                projectCode: '',
                 projectName: '',
-                dateRange: [],
+                examineStatus: undefined,
                 startTime: '',
                 endTime: ''
             }
+            this.dateRange = []
             if (this.operation.queryList) {
                 this.queryListData(this.tablePagination.defaultCurrent, this.tablePagination.defaultPageSize)
             }
@@ -245,7 +244,7 @@ export default {
         // 审核
         examineBtn(record) {
             this.showloadding(true)
-            reviewActionApi({id: record.id}).then(res => {
+            reviewActionApi({ id: record.id }).then(res => {
                 // 全局loading隐藏
                 this.showloadding(false)
                 const data = res.data

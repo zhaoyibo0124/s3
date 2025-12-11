@@ -5,8 +5,8 @@
 		</div>
 		<div class="content-wrap">
 			<div class="left-block">
-				<span>基于招标要求快速优化文件</span>
-				<span class="blue">降低扣分及废标风险</span>
+				<span>招标文件智能编审</span>
+				<!-- <span class="blue">降低扣分及废标风险</span> -->
 				<img src="../../assets/img/login-img.png" alt="login">
 			</div>
 			<div class="right-block">
@@ -27,7 +27,7 @@
 						</a-form-item>
 						<a-form-item>
 							<a-row :gutter="[6, 0]">
-								<a-col :span="17">
+								<a-col :span="14">
 									<a-input size="large" placeholder="请输入验证码"
 										v-decorator="['code', { rules: [{ required: true, message: '请输入验证码', whitespace: true }] }]">
 									</a-input>
@@ -44,56 +44,8 @@
 						</a-form-item>
 					</a-form>
 				</div>
-				<div class="register">还没有账号？点击<span @click="register">立即注册</span></div>
 			</div>
 		</div>
-		<a-modal :bodyStyle="{ padding: 0 }" title="请填写注册信息" :visible="visible" :maskClosable="true" :footer="null"
-			centered width="700px" @cancel="handleCancel">
-			<div class="register-wrap">
-				<a-form-model ref="ruleForm" :model="registerForm" :rules="rules" :label-col="labelCol"
-					:wrapper-col="wrapperCol" style="padding-top: 10px;">
-					<a-form-model-item label="用户账号" prop="loginName">
-						<a-input v-model="registerForm.loginName" placeholder="请输入账号" autocomplete="off" />
-					</a-form-model-item>
-					<a-form-model-item label="用户密码" prop="loginPassword">
-						<a-input-password v-model="registerForm.loginPassword" placeholder="请输入密码"
-							auto-complete="new-password" autocomplete="new-password" />
-					</a-form-model-item>
-					<a-form-model-item label="用户姓名" prop="userName">
-						<a-input v-model="registerForm.userName" placeholder="请输入姓名" />
-					</a-form-model-item>
-					<a-form-model-item label="用户手机号" prop="userMobile">
-						<a-input v-model="registerForm.userMobile" placeholder="请输入手机号" :maxLength="11" />
-					</a-form-model-item>
-					<a-form-model-item label="短信验证码" prop="mobileCode">
-						<a-col :span="14"><a-input v-model="registerForm.mobileCode" placeholder="请输入短信验证码"
-								:maxLength="6" /></a-col>
-						<a-col :span="10">
-							<span class="desc" v-if="countdown">{{ count }}秒后重发</span>
-							<a-button v-else style="width:105px;margin-left: 15px;" type="primary"
-								@click="handleSendMsg">短信验证码</a-button>
-						</a-col>
-					</a-form-model-item>
-					<a-form-model-item label="用户身份证号" prop="userCard">
-						<a-input v-model="registerForm.userCard" placeholder="请输入身份证号" :maxLength="18" />
-					</a-form-model-item>
-					<a-form-model-item label="图片验证码" prop="verificationCode">
-						<a-row>
-							<a-col :span="14"><a-input v-model="registerForm.verificationCode"
-									placeholder="请输入图片验证码" /></a-col>
-							<a-col :span="10"><img
-									style="width:105px;height:32px;border-radius: 6px; margin-left: 15px; margin-top: -3px;"
-									:src="'data:image/jpeg;base64,' + registerCodeUrl" alt=""
-									@click="genPublicKey" /></a-col>
-						</a-row>
-					</a-form-model-item>
-				</a-form-model>
-				<div class="my-btn-view">
-					<a-button style="width:260px" type="primary" @click="handleOk"
-						:loading="handleOkLoading">注册</a-button>
-				</div>
-			</div>
-		</a-modal>
 	</div>
 </template>
 <script>
@@ -109,30 +61,11 @@ import {
 	GenImageCode,
 	GenPublicKey,
 	SystemFindBySystemCode,
-	Register,
 	GenSmsCode
 } from '@/services/commentApiList'
 export default {
 	name: 'Login',
 	data() {
-		var validateidCard = (rule, value, callback) => {
-			// 简单的身份证号校验规则
-			const idCardRegex = /^[1-9]\d{5}(18|19|20)?\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}(\d|[Xx])$/;
-			if (!idCardRegex.test(value)) {
-				callback(new Error('请输入有效的身份证号'));
-			} else {
-				callback();
-			}
-		}
-		var validateidPhone = (rule, value, callback) => {
-			// 简单的手机号校验规则
-			const phoneRegex = /^1[3456789]\d{9}$/;
-			if (!phoneRegex.test(value)) {
-				callback(new Error('请输入有效的手机号'));
-			} else {
-				callback();
-			}
-		}
 		return {
 			logging: false,
 			caLoading: false,
@@ -160,28 +93,7 @@ export default {
 				verificationCode: ''
 			},
 			rules: {
-				userName: [
-					{ required: true, message: '请输入姓名', trigger: 'blur' },
-				],
-				userMobile: [
-					{ required: true, message: '请输入手机号', trigger: 'blur' },
-					{ validator: validateidPhone, trigger: 'blur' }
-				],
-				mobileCode: [{ required: true, message: '请输入短信验证码', trigger: 'blur' }],
-				userCard: [
-					{ required: true, message: '请输入身份证号', trigger: 'blur' },
-					{ validator: validateidCard, trigger: 'blur' }
-				],
-				loginName: [
-					{ required: true, message: '请输入账号', trigger: 'blur' },
-				],
-				loginPassword: [
-					{ required: true, message: '请输入密码', trigger: 'blur' },
-					{ pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z\d]{6,16}$/, message: "密码格式要求:6-16位数字和字母(字母包含大小写)", trigger: "blur" }
-				],
-				verificationCode: [
-					{ required: true, message: '请输入验证码', trigger: 'blur' },
-				],
+
 			},
 			registerPublicKey: '',
 			registerPublicId: '',
@@ -416,77 +328,16 @@ export default {
 				if (data.code == 200) {
 					// 保存数据字典
 					sessionStorage.setItem('queryJsonBasicList', JSON.stringify(data.data))
-					this.$router.push('power/system') 
+					if (this.systemCode == 'client') {
+						this.$router.push('index')
+					} else {
+						this.$router.push('power/system')
+					}
 				} else {
 					this.$message.error(data.msg)
 				}
 			})
 		},
-		passLogin() {
-			this.show = true
-		},
-		//立即注册
-		register() {
-			this.visible = true
-			this.genPublicKey()
-		},
-		// 关闭注册弹窗
-		handleCancel() {
-			this.visible = false
-			this.registerForm = {
-				userName: '',
-				userMobile: '',
-				mobileCode: '',
-				userCard: '',
-				loginName: '',
-				loginPassword: '',
-				systemCode: 'client',
-				verificationId: '',
-				verificationCode: ''
-			}
-			this.genPublicKey()
-		},
-		// 免责声明点击
-		readDesc() {
-			this.visibleDesc = !this.visibleDesc
-		},
-		// 已阅读免责声明
-		read() {
-			this.visibleDesc = false
-			this.isRead = true
-		},
-		// 注册提交
-		handleOk() {
-			this.$refs.ruleForm.validate(valid => {
-				if (valid) {
-					this.handleOkLoading = true
-					const data = {
-						...this.registerForm
-					}
-					Register(data).then(res => {
-						this.handleOkLoading = false
-						const data = res.data
-						if (data.code == 200) {
-							this.$refs.ruleForm.resetFields()		// 清空表单
-							let that = this
-							this.$confirm({
-								title: '注册成功！，请进行登录操作',
-								okText: '确定',
-								okCancel: false,
-								onOk() {
-									that.handleCancel()
-								}
-							})
-						} else {
-							this.$message.error(data.msg)
-						}
-					})
-				} else {
-					this.handleOkLoading = false
-					return false
-				}
-			})
-		}
 	}
 }
 </script>
@@ -495,34 +346,40 @@ export default {
 	width: 100%;
 	height: 100vh;
 	background: url('../../assets/img/login-bg.png') no-repeat;
-	background-size: 100% 100%;
+	background-size: cover;
 	display: flex;
 	flex-direction: column;
-	padding: 0 360px;
+	margin: 0 auto;
 
 	.logo-wrap {
-		margin-top: 60px;
-
+		display: flex;
+		justify-content: flex-start;
+		width: 100%;
+		padding-left: 170px;
+		margin-top: 45px;
 		img {
-			width: 175px;
-			height: 32px;
+			width: 131px;
+			height: 24px;
 		}
 	}
 
 	.content-wrap {
 		display: flex;
-		margin-top: 107px;
-
+		justify-content: space-between;
+		align-items: flex-start;
+		width: 100%;
+		height: 100%;
+		padding: 0 170px;
+		margin-top: 180px;
 		.left-block {
+			width: calc(100% - 365px);
 			display: flex;
 			flex-direction: column;
-			margin-top: 16px;
-			margin-right: 38px;
 
 			span {
 				font-family: 'SourceHanSansCN-Bold';
 				font-weight: 800;
-				font-size: 46px;
+				font-size: 35px;
 				user-select: none;
 			}
 
@@ -540,45 +397,44 @@ export default {
 			}
 
 			img {
-				width: 644px;
-				height: 497px;
-				margin-left: 30px;
+				width: 483px;
+				height: 373px;
+				margin-left: 150px;
 			}
 		}
 
 		.right-block {
-			width: 486px;
-			height: 629px;
-			background: #fff;
-			box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.25);
-			border-radius: 8px;
+			width: 365px;
+			height: 472px;
+			background: #FFFFFF;
+			box-shadow: 0px 0 3px 0px rgba(0, 0, 0, 0.25);
+			border-radius: 6px 6px 6px 6px;
 
 			.login {
-				padding: 0 32px;
+				padding: 0 24px;
 
 				.bt {
 					position: relative;
 					display: block;
-					width: 422px;
-					height: 63px;
-					line-height: 41px;
+					width: 317px;
+					height: 43px;
+					line-height: 31px;
 					border-bottom: 1px solid #DDDDDD;
-					margin-top: 74px;
-					margin-bottom: 50px;
-					padding-bottom: 15px;
+					margin-top: 56px;
+					margin-bottom:38px;
 					text-align: center;
 					font-family: 'SourceHanSansCN-Normal';
 					font-weight: 400;
-					font-size: 28px;
+					font-size: 21px;
 					color: #000000;
 
 					&::after {
 						content: '';
 						position: absolute;
-						bottom: -3px;
-						left: 137px;
+						bottom: -2px;
+						left: 83px;
 						width: 148px;
-						height: 5px;
+						height: 3px;
 						background: #1F63D1;
 
 					}
@@ -586,80 +442,29 @@ export default {
 
 				.code-img {
 					width: 110px;
-					height: 56px;
-					border-radius: 8px;
-					margin-left: 6px;
+					height: 40px;
+					border-radius: 6px;
+					margin-left: 16px;
 					margin-top: -4px;
 				}
 
 				.btn-style {
-					width: 422px;
-					height: 48px;
-					line-height: 48px;
+					width: 317px;
+					height: 42px;
+					line-height: 42px;
 					background: #1F63D1;
-					border-radius: 8px;
+					border-radius: 6px;
 					border-color: #1F63D1;
 					margin-top: 24px;
 					font-family: 'SourceHanSansCN-Normal';
 					font-weight: 400;
-					font-size: 18px;
-				}
-			}
-
-			.register {
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				font-family: 'SourceHanSansCN-Normal';
-				font-weight: 400;
-				font-size: 16px;
-				color: #999999;
-
-				span {
-					color: #1F63D1;
-					cursor: pointer;
+					font-size: 16px;
 				}
 			}
 		}
 	}
 
-	.register-wrap {
-		display: flex;
-		flex-direction: column;
-	}
 
-}
-
-.code-block {
-	display: flex;
-	justify-content: flex-start;
-	align-items: center;
-
-	.code-img {
-		width: 120px;
-		height: 43px;
-		border-radius: 6px;
-		margin-left: 6px;
-		// margin-top: -4px;
-	}
-}
-
-
-
-.my-btn-view {
-	width: 100%;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	margin-top: 20px;
-}
-
-.desc {
-	display: inline-block;
-	margin-left: 10px;
-	width: 150px;
-	text-align: center;
-	color: #bfbfbf;
 }
 
 ::v-deep .ant-input {

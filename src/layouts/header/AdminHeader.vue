@@ -11,8 +11,10 @@
         <i-menu class="head-menu" :theme="headerTheme" mode="horizontal" :options="menuData" @select="onSelect" />
       </div>
       <div class="logo-custom">
-        <img width="131" src="@/assets/img/login-logo.png" />
-        <span>{{ systemName }}</span>
+        <router-link to="/power/system">
+          <img width="131" src="@/assets/img/login-logo.png" />
+          <span>{{ systemName }}</span>
+        </router-link>
         <div class="desc-box">
           <img src="../../assets/img/icon-header1.png" alt=""/>
           <span>审查精准化</span>

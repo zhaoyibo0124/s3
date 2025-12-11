@@ -12,9 +12,12 @@
 		</template>
 		<a-form-model ref="ruleForm" :model="form" :rules="rules" :label-col="labelCol" :wrapper-col="wrapperCol"
 			style="padding-top: 10px;">
-			<a-form-model-item label="项目规模" prop="projectScale">
-				<a-select v-model="form.projectScale" placeholder="请选择" :disabled="title == '查看'">
-					<a-select-option v-for="item, index in queryJsonBasicList.projectScale" :key="index"
+			<a-form-model-item label="范本名称" prop="templateName">
+				<a-input v-model="form.templateName" placeholder="请输入" :disabled="title == '查看'" />
+			</a-form-model-item>
+			<a-form-model-item label="项目类型" prop="projectType">
+				<a-select v-model="form.projectType" placeholder="请选择" :disabled="title == '查看'">
+					<a-select-option v-for="item, index in queryJsonBasicList.projectType" :key="index"
 						:value="item.code">{{
 							item.name }}</a-select-option>
 				</a-select>
@@ -26,33 +29,15 @@
 							item.name }}</a-select-option>
 				</a-select>
 			</a-form-model-item>
-			<a-form-model-item label="项目类型" prop="projectType">
-				<a-select v-model="form.projectType" placeholder="请选择" :disabled="title == '查看'">
-					<a-select-option v-for="item, index in queryJsonBasicList.projectType" :key="index"
+			<a-form-model-item label="项目规模" prop="projectScale">
+				<a-select v-model="form.projectScale" placeholder="请选择" :disabled="title == '查看'">
+					<a-select-option v-for="item, index in queryJsonBasicList.projectScale" :key="index"
 						:value="item.code">{{
 							item.name }}</a-select-option>
 				</a-select>
 			</a-form-model-item>
 			<a-form-model-item label="终止规则" prop="terminationRule">
 				<a-input v-model="form.terminationRule" placeholder="请输入" :disabled="title == '查看'" />
-			</a-form-model-item>
-			<!-- <a-form-model-item label="文件名称" prop="projectFileName">
-				<a-input v-model="form.projectFileName" placeholder="请输入" :disabled="title == '查看'" />
-			</a-form-model-item>
-			<a-form-model-item label="文件别名" prop="projectFileAlias">
-				<a-input v-model="form.projectFileAlias" placeholder="请输入" :disabled="title == '查看'" />
-			</a-form-model-item>
-			<a-form-model-item label="文件类型" prop="projectFileType">
-				<a-input v-model="form.projectFileType" placeholder="请输入" :disabled="title == '查看'" />
-			</a-form-model-item>
-			<a-form-model-item label="文件路径" prop="projectFilePath">
-				<a-input v-model="form.projectFilePath" placeholder="请输入" :disabled="title == '查看'" />
-			</a-form-model-item>
-			<a-form-model-item label="文件网络路径" prop="projectFileUrl">
-				<a-input v-model="form.projectFileUrl" placeholder="请输入" :disabled="title == '查看'" />
-			</a-form-model-item> -->
-			<a-form-model-item label="范本名称" prop="templateName">
-				<a-input v-model="form.templateName" placeholder="请输入" :disabled="title == '查看'" />
 			</a-form-model-item>
 			<a-form-model-item label="上传范本" prop="file" v-if="title == '新增'">
 				<a-upload ref="upload" name="file" accept=".doc,.docx" :before-upload="beforeUpload"
@@ -89,36 +74,24 @@ export default {
 				file: {}
 			},
 			rules: {
-				// projectScale: [
-				// 	{ required: true, message: '请选择项目规模', trigger: 'change' },
-				// ],
-				// projectCategory: [
-				// 	{ required: true, message: '请选择项目类别', trigger: 'change' },
-				// ],
-				// projectType: [
-				// 	{ required: true, message: '请选择项目类型', trigger: 'change' },
-				// ],
-				// terminationRule: [
-				// 	{ required: true, message: '请输入终止规则', trigger: 'blur' },
-				// ],
-				// templateName: [
-				// 	{ required: true, message: '请输入范本名称', trigger: 'blur' },
-				// ],
+				projectScale: [
+					{ required: true, message: '请选择项目规模', trigger: 'change' },
+				],
+				projectCategory: [
+					{ required: true, message: '请选择项目类别', trigger: 'change' },
+				],
+				projectType: [
+					{ required: true, message: '请选择项目类型', trigger: 'change' },
+				],
+				terminationRule: [
+					{ required: true, message: '请输入终止规则', trigger: 'blur' },
+				],
+				templateName: [
+					{ required: true, message: '请输入范本名称', trigger: 'blur' },
+				],
 				file: [
 					{ required: true, message: '请上传文件', trigger: 'change' },
 				],
-				// projectFileAlias: [
-				// 	{ required: true, message: '请输入文件别名', trigger: 'blur' },
-				// ],
-				// projectFileType: [
-				// 	{ required: true, message: '请输入文件类型', trigger: 'blur' },
-				// ],
-				// projectFilePath: [
-				// 	{ required: true, message: '请输入文件路径', trigger: 'blur' },
-				// ],
-				// projectFileUrl: [
-				// 	{ required: true, message: '请输入文件网络路径', trigger: 'blur' },
-				// ],
 			}
 		}
 	},

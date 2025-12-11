@@ -1,5 +1,5 @@
 <template>
-  <a-layout-header :class="[headerTheme, 'admin-header']" style="height: 48px; line-height: 48px;">
+  <a-layout-header :class="[headerTheme, 'admin-header']" style="height: 64px; line-height: 64px;">
     <div :class="['admin-header-wide', layout, pageWidth]">
       <router-link v-if="isMobile || layout === 'head'" to="/" :class="['logo', isMobile ? null : 'pc', headerTheme]">
         <img width="32" src="@/assets/img/login-logo.png" />
@@ -11,8 +11,11 @@
         <i-menu class="head-menu" :theme="headerTheme" mode="horizontal" :options="menuData" @select="onSelect" />
       </div>
       <div class="logo-custom">
-        <img width="131" src="@/assets/img/login-logo.png" />
-        <span>{{ systemName }}</span>
+        <router-link to="/index">
+          <img width="131" src="@/assets/img/login-logo.png" />
+          <span>{{ systemName }}</span>
+        </router-link>
+
         <div class="desc-box">
           <img src="../../assets/img/icon-header1.png" alt="" />
           <span>审查精准化</span>

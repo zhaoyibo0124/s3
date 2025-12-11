@@ -36,8 +36,8 @@
 </template>
 <script>
 import {
-	recognizeAddApi,
-	recognizeUpdateApi
+	basicLogicAddApi,
+	basicLogicUpdateApi
 } from '@/services/commentApiList'
 export default {
 	name: 'addAlert',
@@ -92,7 +92,7 @@ export default {
 					if (this.title == '新增') {
 						const data = JSON.parse(JSON.stringify(this.form))
 						delete data.id
-						recognizeAddApi(data).then(res => {
+						basicLogicAddApi(data).then(res => {
 							this.handleOkLoading = false
 							const data = res.data
 							if (data.code == 200) {
@@ -104,7 +104,7 @@ export default {
 						})
 					} else if (this.title == '编辑') {
 						const data = JSON.parse(JSON.stringify(this.form))
-						recognizeUpdateApi(data).then(res => {
+						basicLogicUpdateApi(data).then(res => {
 							this.handleOkLoading = false
 							const data = res.data
 							if (data.code == 200) {

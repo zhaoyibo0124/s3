@@ -59,10 +59,10 @@
 import { mapState, mapMutations } from 'vuex'
 import infoAlert from './operation.vue'
 import {
-	basicLogicDeleteApi,
-	basicLogicDisableApi,
-	basicLogicRecoveryApi,
-	basicLogicQueryListApi,
+	recognizeDeleteApi,
+	recognizeDisableApi,
+	recognizeRecoveryApi,
+	recognizeQueryListApi,
 	PowerFindPowerOperation
 } from '@/services/commentApiList'
 export default {
@@ -91,9 +91,9 @@ export default {
 					customRender: (text, record) => <a-tooltip placement="topLeft" title={record.ruleName}>{record.ruleName}</a-tooltip>
 				},
 				{
-					title: '规则类型',
-					dataIndex: 'ruleType',
-					customRender: (text, record) => <span>{this.queryJsonBasicList.extractType.filter(item => item.code == record.ruleType).map(item =>
+					title: '是否调用模型',
+					dataIndex: 'isCallModel',
+					customRender: (text, record) => <span>{this.queryJsonBasicList.yesNoType.filter(item => item.code == record.isCallModel).map(item =>
 						item.name)}</span>,
 				},
 				{
@@ -199,7 +199,7 @@ export default {
 				pageNo: page == undefined ? this.tablePagination.defaultCurrent : page,
 				pageSize: pageSize == undefined ? this.tablePagination.defaultPageSize : pageSize
 			}
-			basicLogicQueryListApi(data).then(res => {
+			recognizeQueryListApi(data).then(res => {
 				// 全局loading隐藏
 				this.showloadding(false)
 				const data = res.data
@@ -272,7 +272,7 @@ export default {
 					const data = {
 						id: record.id
 					}
-					basicLogicDeleteApi(data).then(res => {
+					recognizeDeleteApi(data).then(res => {
 						const data = res.data
 						if (data.code == 200) {
 							if (that.operation.queryList) {
@@ -300,7 +300,7 @@ export default {
 					const data = {
 						id: record.id
 					}
-					basicLogicDisableApi(data).then(res => {
+					recognizeDisableApi(data).then(res => {
 						const data = res.data
 						if (data.code == 200) {
 							if (that.operation.queryList) {
@@ -328,7 +328,7 @@ export default {
 					const data = {
 						id: record.id
 					}
-					basicLogicRecoveryApi(data).then(res => {
+					recognizeRecoveryApi(data).then(res => {
 						const data = res.data
 						if (data.code == 200) {
 							if (that.operation.queryList) {

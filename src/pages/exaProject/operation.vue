@@ -12,49 +12,59 @@
 		</template>
 		<a-form-model ref="ruleForm" :model="form" :rules="rules" :label-col="labelCol" :wrapper-col="wrapperCol"
 			style="padding-top: 10px;">
-			<a-form-model-item label="项目规模" prop="projectScale">
-				<a-select v-model="form.projectScale" placeholder="请选择" :disabled="title == '查看'">
-					<a-select-option v-for="item, index in queryJsonBasicList.projectScale" :key="index"
-						:value="item.code">{{
-							item.name }}</a-select-option>
-				</a-select>
+			<a-form-model-item label="项目编号" prop="projectCode">
+				<a-input v-model="form.projectCode" placeholder="请输入" :disabled="title == '查看'" />
 			</a-form-model-item>
-			<a-form-model-item label="项目类别" prop="projectCategory">
-				<a-select v-model="form.projectCategory" placeholder="请选择" :disabled="title == '查看'">
-					<a-select-option v-for="item, index in queryJsonBasicList.projectCategory" :key="index"
-						:value="item.code">{{
-							item.name }}</a-select-option>
-				</a-select>
+			<a-form-model-item label="项目名称" prop="projectName">
+				<a-input v-model="form.projectName" placeholder="请输入" :disabled="title == '查看'" />
 			</a-form-model-item>
 			<a-form-model-item label="项目类型" prop="projectType">
-				<a-select v-model="form.projectType" placeholder="请选择" :disabled="title == '查看'">
+				<a-select v-model="form.projectType" placeholder="请选择" :disabled="title == '查看'"
+					@change="changeProject">
 					<a-select-option v-for="item, index in queryJsonBasicList.projectType" :key="index"
 						:value="item.code">{{
 							item.name }}</a-select-option>
 				</a-select>
 			</a-form-model-item>
-			<a-form-model-item label="终止规则" prop="terminationRule">
-				<a-input v-model="form.terminationRule" placeholder="请输入" :disabled="title == '查看'" />
+			<a-form-model-item label="项目类别" prop="projectCategory">
+				<a-select v-model="form.projectCategory" placeholder="请选择" :disabled="title == '查看'"
+					@change="changeProject">
+					<a-select-option v-for="item, index in queryJsonBasicList.projectCategory" :key="index"
+						:value="item.code">{{
+							item.name }}</a-select-option>
+				</a-select>
 			</a-form-model-item>
-			<!-- <a-form-model-item label="文件名称" prop="projectFileName">
-				<a-input v-model="form.projectFileName" placeholder="请输入" :disabled="title == '查看'" />
+			<a-form-model-item label="项目规模" prop="projectScale">
+				<a-select v-model="form.projectScale" placeholder="请选择" :disabled="title == '查看'"
+					@change="changeProject">
+					<a-select-option v-for="item, index in queryJsonBasicList.projectScale" :key="index"
+						:value="item.code">{{
+							item.name }}</a-select-option>
+				</a-select>
 			</a-form-model-item>
-			<a-form-model-item label="文件别名" prop="projectFileAlias">
-				<a-input v-model="form.projectFileAlias" placeholder="请输入" :disabled="title == '查看'" />
+			<a-form-model-item label="范本" prop="templateId" v-if="modelOptions.length > 0">
+				<a-select :show-search="true" option-filter-prop="children" v-model="form.templateId" placeholder="请选择"
+					:disabled="title == '查看'">
+					<a-select-option v-for="item, index in modelOptions" :key="index" :value="item.id">{{
+						item.templateName
+					}}</a-select-option>
+				</a-select>
 			</a-form-model-item>
-			<a-form-model-item label="文件类型" prop="projectFileType">
-				<a-input v-model="form.projectFileType" placeholder="请输入" :disabled="title == '查看'" />
+			<a-form-model-item label="项目分类" prop="projectClassify">
+				<a-select v-model="form.projectClassify" placeholder="请选择" :disabled="title == '查看'">
+					<a-select-option v-for="item, index in queryJsonBasicList.projectClassify" :key="index"
+						:value="item.code">{{
+							item.name }}</a-select-option>
+				</a-select>
 			</a-form-model-item>
-			<a-form-model-item label="文件路径" prop="projectFilePath">
-				<a-input v-model="form.projectFilePath" placeholder="请输入" :disabled="title == '查看'" />
+			<a-form-model-item label="资金来源" prop="projectFundSource">
+				<a-select v-model="form.projectFundSource" placeholder="请选择" :disabled="title == '查看'">
+					<a-select-option v-for="item, index in queryJsonBasicList.fundSource" :key="index"
+						:value="item.code">{{
+							item.name }}</a-select-option>
+				</a-select>
 			</a-form-model-item>
-			<a-form-model-item label="文件网络路径" prop="projectFileUrl">
-				<a-input v-model="form.projectFileUrl" placeholder="请输入" :disabled="title == '查看'" />
-			</a-form-model-item> -->
-			<a-form-model-item label="范本名称" prop="templateName">
-				<a-input v-model="form.templateName" placeholder="请输入" :disabled="title == '查看'" />
-			</a-form-model-item>
-			<a-form-model-item label="上传范本" prop="file" v-if="title == '新增'">
+			<a-form-model-item label="上传文件" prop="file" v-if="title == '新增'">
 				<a-upload ref="upload" name="file" accept=".doc,.docx" :before-upload="beforeUpload"
 					:disabled="title != '新增'">
 					<a-button> <a-icon type="upload" />选择文件</a-button>
@@ -66,8 +76,9 @@
 </template>
 <script>
 import {
-	exaFileUpdateApi,
-	exaFileUploadApi
+	exaProjectUpdateApi,
+	exaProjectAddApi,
+	modelListApi
 } from '@/services/commentApiList'
 export default {
 	name: 'addAlert',
@@ -81,54 +92,81 @@ export default {
 			wrapperCol: { span: 11, offset: 1 },
 			form: {
 				id: this.defaultData.data.id ? this.defaultData.data.id : '',
+				projectName: '',
+				projectCode: '',
 				projectScale: undefined,
 				projectCategory: undefined,
 				projectType: undefined,
-				terminationRule: '',
-				templateName: '',
+				projectClassify: undefined,
+				projectFundSource: undefined,
+				templateId: undefined,
 				file: {}
 			},
 			rules: {
-				// projectScale: [
-				// 	{ required: true, message: '请选择项目规模', trigger: 'change' },
-				// ],
-				// projectCategory: [
-				// 	{ required: true, message: '请选择项目类别', trigger: 'change' },
-				// ],
-				// projectType: [
-				// 	{ required: true, message: '请选择项目类型', trigger: 'change' },
-				// ],
-				// terminationRule: [
-				// 	{ required: true, message: '请输入终止规则', trigger: 'blur' },
-				// ],
-				// templateName: [
-				// 	{ required: true, message: '请输入范本名称', trigger: 'blur' },
-				// ],
+				projectName: [
+					{ required: true, message: '请输入项目名称', trigger: 'blur' },
+				],
+				projectCode: [
+					{ required: true, message: '请输入项目编号', trigger: 'blur' },
+				],
+				projectScale: [
+					{ required: true, message: '请选择项目规模', trigger: 'change' },
+				],
+				projectCategory: [
+					{ required: true, message: '请选择项目类别', trigger: 'change' },
+				],
+				projectType: [
+					{ required: true, message: '请选择项目类型', trigger: 'change' },
+				],
+				projectClassify: [
+					{ required: true, message: '请选择项目分类', trigger: 'change' },
+				],
+				projectFundSource: [
+					{ required: true, message: '请选择资金来源', trigger: 'change' },
+				],
+				templateId: [
+					{ required: true, message: '请输入范本名称', trigger: 'blur' },
+				],
 				file: [
 					{ required: true, message: '请上传文件', trigger: 'change' },
 				],
-				// projectFileAlias: [
-				// 	{ required: true, message: '请输入文件别名', trigger: 'blur' },
-				// ],
-				// projectFileType: [
-				// 	{ required: true, message: '请输入文件类型', trigger: 'blur' },
-				// ],
-				// projectFilePath: [
-				// 	{ required: true, message: '请输入文件路径', trigger: 'blur' },
-				// ],
-				// projectFileUrl: [
-				// 	{ required: true, message: '请输入文件网络路径', trigger: 'blur' },
-				// ],
-			}
+
+			},
+			modelOptions: []
 		}
 	},
 	created() {
 		this.handleData()
+		if (this.title == '编辑') {
+			this.getModelOptions()
+		}
 	},
 	methods: {
+		getModelOptions() {
+			const data = {
+				projectScale: this.form.projectScale,
+				projectCategory: this.form.projectCategory,
+				projectType: this.form.projectType,
+				pageNo: -1,
+				pageSize: -1
+			}
+			modelListApi(data).then(res => {
+				const data = res.data
+				if (data.code == 200) {
+					this.modelOptions = data.data.list
+				} else {
+					this.$message.error(data.msg)
+				}
+			})
+		},
 		handleData() {
 			for (let k in this.form) {
 				this.form[k] = this.defaultData.data[k]
+			}
+		},
+		changeProject() {
+			if (this.form.projectType && this.form.projectCategory && this.form.projectScale) {
+				this.getModelOptions()
 			}
 		},
 		//文件上传校验
@@ -144,14 +182,18 @@ export default {
 					if (this.title == '新增') {
 						const formData = new FormData();
 						formData.append("file", this.form.file);
+						formData.append("projectName", this.form.projectName);
+						formData.append("projectCode", this.form.projectCode);
 						formData.append("projectScale", this.form.projectScale);
 						formData.append("projectCategory", this.form.projectCategory);
 						formData.append("projectType", this.form.projectType);
-						formData.append("terminationRule", this.form.terminationRule);
-						formData.append("templateName", this.form.templateName);
-						exaFileUploadApi(formData).then(res => {
+						formData.append("projectClassify", this.form.projectClassify);
+						formData.append("projectFundSource", this.form.projectFundSource);
+						formData.append("templateId", this.form.templateId);
+						exaProjectAddApi(formData).then(res => {
 							const data = res.data
 							if (data.code == 200) {
+								this.$message.success('操作成功')
 								this.$refs.ruleForm.resetFields()		// 清空表单
 								this.$emit('confirmValue', '')
 							} else {
@@ -160,16 +202,20 @@ export default {
 						})
 					} else if (this.title == '编辑') {
 						const formData = new FormData();
+						formData.append("projectName", this.form.projectName);
+						formData.append("projectCode", this.form.projectCode);
 						formData.append("projectScale", this.form.projectScale);
 						formData.append("projectCategory", this.form.projectCategory);
 						formData.append("projectType", this.form.projectType);
-						formData.append("terminationRule", this.form.terminationRule);
-						formData.append("templateName", this.form.templateName);
+						formData.append("projectClassify", this.form.projectClassify);
+						formData.append("projectFundSource", this.form.projectFundSource);
+						formData.append("templateId", this.form.templateId);
 						formData.append("id", this.form.id);
-						exaFileUpdateApi(formData).then(res => {
+						exaProjectUpdateApi(formData).then(res => {
 							this.handleOkLoading = false
 							const data = res.data
 							if (data.code == 200) {
+								this.$message.success('操作成功')
 								this.$refs.ruleForm.resetFields()		// 清空表单
 								this.$emit('confirmValue', '')
 							} else {
